@@ -19,7 +19,7 @@ static void ActivateCurrentApp(void) {
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
     self.popover = [[NSPopover alloc] init];
     self.popover.behavior = NSPopoverBehaviorTransient;
-    self.popover.contentSize = NSMakeSize(420.0, 440.0);
+    self.popover.contentSize = NSMakeSize(500.0, 440.0);
     self.popover.contentViewController = [[SVGPopoverViewController alloc] init];
     self.popover.delegate = self;
 

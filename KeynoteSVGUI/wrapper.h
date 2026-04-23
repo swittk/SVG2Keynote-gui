@@ -7,5 +7,6 @@
 - (NSData *)generateClipboardMetadataWithDocumentUUIDString:(NSString *)documentUUIDString;
 - (NSData *)generateClipboardDescriptionForDrawableCount:(NSInteger)drawableCount;
 - (NSInteger)drawableCountForClipboardData:(NSData *)clipboardData;
+- (NSString *)svgStringFromClipboardData:(NSData *)clipboardData;
 
 @end

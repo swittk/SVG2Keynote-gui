@@ -232,4 +232,21 @@ static NSData *GenerateClipboardDescriptionData(NSInteger drawableCount) {
     return CountDrawableReferencesInClipboardData(clipboardData);
 }
 
+- (NSString *)svgStringFromClipboardData:(NSData *)clipboardData {
+    if (clipboardData.length == 0) {
+        return nil;
+    }
+
+    const std::string clipboard(
+        static_cast<const char *>(clipboardData.bytes),
+        static_cast<size_t>(clipboardData.length)
+    );
+    const std::string svg = generateSVGFromTSPNativeDataClipboard(clipboard);
+    if (svg.empty()) {
+        return nil;
+    }
+
+    return [[NSString alloc] initWithBytes:svg.data() length:svg.length() encoding:NSUTF8StringEncoding];
+}
+
 @end

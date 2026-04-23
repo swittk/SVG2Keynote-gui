@@ -9,6 +9,7 @@
 @property (nonatomic, strong) WKWebView *previewView;
 @property (nonatomic, strong) NSTextField *statusLabel;
 @property (nonatomic, strong) NSButton *openButton;
+@property (nonatomic, strong) NSButton *saveClipboardButton;
 @property (nonatomic, strong) NSButton *clipboardButton;
 @property (nonatomic, strong) NSButton *quitButton;
 @property (nonatomic, copy) NSString *currentSVGString;
@@ -19,7 +20,7 @@
 @implementation SVGPopoverViewController
 
 - (void)loadView {
-    self.view = [[NSView alloc] initWithFrame:NSMakeRect(0.0, 0.0, 420.0, 440.0)];
+    self.view = [[NSView alloc] initWithFrame:NSMakeRect(0.0, 0.0, 500.0, 440.0)];
 }
 
 - (void)viewDidLoad {
@@ -58,6 +59,9 @@
     self.openButton = [NSButton buttonWithTitle:@"Open SVG File" target:self action:@selector(openSVG:)];
     self.openButton.translatesAutoresizingMaskIntoConstraints = NO;
 
+    self.saveClipboardButton = [NSButton buttonWithTitle:@"Save Clipboard..." target:self action:@selector(saveClipboard:)];
+    self.saveClipboardButton.translatesAutoresizingMaskIntoConstraints = NO;
+
     self.quitButton = [NSButton buttonWithTitle:@"Quit" target:self action:@selector(quitApp:)];
     self.quitButton.translatesAutoresizingMaskIntoConstraints = NO;
 
@@ -69,6 +73,7 @@
     [self.view addSubview:previewContainer];
     [self.view addSubview:self.statusLabel];
     [self.view addSubview:self.openButton];
+    [self.view addSubview:self.saveClipboardButton];
     [self.view addSubview:self.quitButton];
     [self.view addSubview:self.clipboardButton];
 
@@ -91,8 +96,11 @@
         [self.openButton.leadingAnchor constraintEqualToAnchor:previewContainer.leadingAnchor],
         [self.openButton.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor constant:-16.0],
 
+        [self.saveClipboardButton.centerYAnchor constraintEqualToAnchor:self.openButton.centerYAnchor],
+        [self.saveClipboardButton.leadingAnchor constraintEqualToAnchor:self.openButton.trailingAnchor constant:12.0],
+
         [self.quitButton.centerYAnchor constraintEqualToAnchor:self.openButton.centerYAnchor],
-        [self.quitButton.leadingAnchor constraintEqualToAnchor:self.openButton.trailingAnchor constant:12.0],
+        [self.quitButton.leadingAnchor constraintEqualToAnchor:self.saveClipboardButton.trailingAnchor constant:12.0],
 
         [self.clipboardButton.centerYAnchor constraintEqualToAnchor:self.openButton.centerYAnchor],
         [self.clipboardButton.trailingAnchor constraintEqualToAnchor:previewContainer.trailingAnchor],
@@ -103,7 +111,7 @@
 - (void)loadPlaceholder {
     self.previewReady = NO;
     self.clipboardButton.enabled = NO;
-    [self updateStatus:@"Open an SVG file. Copy places editable Keynote shapes on the clipboard."];
+    [self updateStatus:@"Open an SVG file to preview and copy editable Keynote shapes, or save the current clipboard back out as SVG or PNG."];
     [self.previewView loadHTMLString:@"<!DOCTYPE html><html><body style=\"margin:0; display:flex; align-items:center; justify-content:center; min-height:100vh; font:13px -apple-system; color:#666; background:transparent;\">Select an SVG file to preview it here.</body></html>" baseURL:nil];
 }
 
@@ -113,8 +121,6 @@
 }
 
 - (void)openSVG:(id)sender {
-    [self activateForForegroundInteraction];
-
     NSOpenPanel *panel = [NSOpenPanel openPanel];
     panel.allowedFileTypes = @[ @"svg" ];
     panel.allowsMultipleSelection = NO;
@@ -122,18 +128,7 @@
     panel.canCreateDirectories = NO;
     panel.directoryURL = self.currentFileURL.URLByDeletingLastPathComponent;
 
-    AppDelegate *appDelegate = (AppDelegate *)NSApp.delegate;
-    const BOOL shouldRestorePopover = [appDelegate isPopoverShown];
-    if (shouldRestorePopover) {
-        [appDelegate closePopover];
-    }
-
-    NSInteger response = [panel runModal];
-    [self activateForForegroundInteraction];
-    if (shouldRestorePopover) {
-        [appDelegate showPopoverFromStatusItem];
-    }
-
+    NSInteger response = [self runModalPanelWithPopoverTemporarilyClosed:panel];
     if (response != NSModalResponseOK) {
         return;
     }
@@ -162,6 +157,24 @@
     [self updateStatus:[NSString stringWithFormat:@"Loading %@…", selectedURL.lastPathComponent ?: @"SVG"]];
     NSURL *readAccessURL = selectedURL.URLByDeletingLastPathComponent ?: selectedURL;
     [self.previewView loadFileURL:selectedURL allowingReadAccessToURL:readAccessURL];
+}
+
+- (NSInteger)runModalPanelWithPopoverTemporarilyClosed:(NSSavePanel *)panel {
+    [self activateForForegroundInteraction];
+
+    AppDelegate *appDelegate = (AppDelegate *)NSApp.delegate;
+    const BOOL shouldRestorePopover = [appDelegate isPopoverShown];
+    if (shouldRestorePopover) {
+        [appDelegate closePopover];
+    }
+
+    NSInteger response = [panel runModal];
+    [self activateForForegroundInteraction];
+    if (shouldRestorePopover) {
+        [appDelegate showPopoverFromStatusItem];
+    }
+
+    return response;
 }
 
 - (void)copyToClipboard:(id)sender {
@@ -196,6 +209,81 @@
 
 - (void)quitApp:(id)sender {
     [NSApp terminate:sender];
+}
+
+- (NSData *)PNGDataForImage:(NSImage *)image {
+    if (image == nil) {
+        return nil;
+    }
+
+    CGImageRef cgImage = [image CGImageForProposedRect:NULL context:nil hints:nil];
+    if (cgImage != NULL) {
+        NSBitmapImageRep *bitmap = [[NSBitmapImageRep alloc] initWithCGImage:cgImage];
+        return [bitmap representationUsingType:NSBitmapImageFileTypePNG properties:@{}];
+    }
+
+    NSData *tiffData = [image TIFFRepresentation];
+    if (tiffData.length == 0) {
+        return nil;
+    }
+
+    NSBitmapImageRep *bitmap = [NSBitmapImageRep imageRepWithData:tiffData];
+    return [bitmap representationUsingType:NSBitmapImageFileTypePNG properties:@{}];
+}
+
+- (void)saveClipboard:(id)sender {
+    NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
+    CPP_Wrapper *wrapper = [[CPP_Wrapper alloc] init];
+
+    NSData *nativeData = [pasteboard dataForType:@"com.apple.iWork.TSPNativeData"];
+    if (nativeData.length > 0) {
+        NSString *svgString = [wrapper svgStringFromClipboardData:nativeData];
+        if (svgString.length > 0) {
+            NSSavePanel *panel = [NSSavePanel savePanel];
+            panel.allowedFileTypes = @[ @"svg" ];
+            panel.canCreateDirectories = YES;
+            panel.directoryURL = self.currentFileURL.URLByDeletingLastPathComponent;
+            panel.nameFieldStringValue = @"keynote-clipboard.svg";
+
+            if ([self runModalPanelWithPopoverTemporarilyClosed:panel] != NSModalResponseOK) {
+                return;
+            }
+
+            NSError *writeError = nil;
+            if ([svgString writeToURL:panel.URL atomically:YES encoding:NSUTF8StringEncoding error:&writeError]) {
+                [self updateStatus:[NSString stringWithFormat:@"Saved vector clipboard data as %@.", panel.URL.lastPathComponent ?: @"SVG"]];
+            } else {
+                [self updateStatus:writeError.localizedDescription ?: @"Failed to save the SVG file."];
+            }
+            return;
+        }
+    }
+
+    if ([NSImage canInitWithPasteboard:pasteboard]) {
+        NSImage *image = [[NSImage alloc] initWithPasteboard:pasteboard];
+        NSData *pngData = [self PNGDataForImage:image];
+        if (pngData.length > 0) {
+            NSSavePanel *panel = [NSSavePanel savePanel];
+            panel.allowedFileTypes = @[ @"png" ];
+            panel.canCreateDirectories = YES;
+            panel.directoryURL = self.currentFileURL.URLByDeletingLastPathComponent;
+            panel.nameFieldStringValue = @"clipboard-image.png";
+
+            if ([self runModalPanelWithPopoverTemporarilyClosed:panel] != NSModalResponseOK) {
+                return;
+            }
+
+            NSError *writeError = nil;
+            if ([pngData writeToURL:panel.URL options:NSDataWritingAtomic error:&writeError]) {
+                [self updateStatus:[NSString stringWithFormat:@"Saved clipboard image as %@.", panel.URL.lastPathComponent ?: @"PNG"]];
+            } else {
+                [self updateStatus:writeError.localizedDescription ?: @"Failed to save the clipboard image."];
+            }
+            return;
+        }
+    }
+
+    [self updateStatus:@"Clipboard does not contain an exportable Keynote vector shape or image."];
 }
 
 - (void)writeKeynoteClipboardData:(NSData *)clipboardData

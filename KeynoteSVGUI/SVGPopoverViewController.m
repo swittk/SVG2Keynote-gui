@@ -7,6 +7,97 @@
 
 static NSString *const kCompatibilityProfileDefaultsKey = @"CompatibilityProfile";
 
+typedef struct {
+    NSInteger topLevelDrawableCount;
+    NSInteger drawableInfoKindsCount;
+    NSUInteger elementKindsMask;
+    NSInteger objectCount;
+    NSInteger maxInlineNestingDepth;
+} ClipboardDescriptionSummary;
+
+static void AccumulateClipboardDescriptionDrawable(id drawableDescription,
+                                                  NSMutableSet<NSString *> *topLevelClasses,
+                                                  NSUInteger *elementKindsMask,
+                                                  NSInteger *maxInlineNestingDepth,
+                                                  BOOL isTopLevel) {
+    if (![drawableDescription isKindOfClass:[NSDictionary class]]) {
+        return;
+    }
+
+    NSDictionary *drawableDictionary = (NSDictionary *)drawableDescription;
+    if (isTopLevel) {
+        NSString *className = drawableDictionary[@"class"];
+        if ([className isKindOfClass:[NSString class]] && className.length > 0) {
+            [topLevelClasses addObject:className];
+        }
+    }
+
+    NSNumber *elementKind = drawableDictionary[@"elementKind"];
+    if ([elementKind isKindOfClass:[NSNumber class]]) {
+        NSInteger kindValue = elementKind.integerValue;
+        if (kindValue > 0 && kindValue <= (NSInteger)(sizeof(NSUInteger) * 8)) {
+            *elementKindsMask |= ((NSUInteger)1 << (NSUInteger)(kindValue - 1));
+        }
+    }
+
+    NSNumber *inlineDepth = drawableDictionary[@"maxInlineNestingDepth"];
+    if ([inlineDepth isKindOfClass:[NSNumber class]]) {
+        *maxInlineNestingDepth = MAX(*maxInlineNestingDepth, inlineDepth.integerValue);
+    }
+
+    NSArray *groupChildren = drawableDictionary[@"groupChildren"];
+    if (![groupChildren isKindOfClass:[NSArray class]]) {
+        return;
+    }
+
+    for (id childDescription in groupChildren) {
+        AccumulateClipboardDescriptionDrawable(childDescription, topLevelClasses, elementKindsMask, maxInlineNestingDepth, NO);
+    }
+}
+
+static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *clipboardDescriptionData, NSInteger fallbackDrawableCount) {
+    ClipboardDescriptionSummary summary;
+    summary.topLevelDrawableCount = MAX(fallbackDrawableCount, 1);
+    summary.drawableInfoKindsCount = 1;
+    summary.elementKindsMask = 2;
+    summary.objectCount = 2;
+    summary.maxInlineNestingDepth = 1;
+
+    if (clipboardDescriptionData.length == 0) {
+        return summary;
+    }
+
+    NSError *error = nil;
+    id propertyList = [NSPropertyListSerialization propertyListWithData:clipboardDescriptionData
+                                                                options:NSPropertyListImmutable
+                                                                 format:NULL
+                                                                  error:&error];
+    if (error != nil || ![propertyList isKindOfClass:[NSDictionary class]]) {
+        return summary;
+    }
+
+    NSDictionary *clipboardDescription = (NSDictionary *)propertyList;
+    summary.objectCount = MAX((NSInteger)clipboardDescription.count, 1);
+
+    NSArray *drawables = clipboardDescription[@"drawables"];
+    if (![drawables isKindOfClass:[NSArray class]] || drawables.count == 0) {
+        return summary;
+    }
+
+    summary.topLevelDrawableCount = MAX((NSInteger)drawables.count, 1);
+    NSMutableSet<NSString *> *topLevelClasses = [NSMutableSet set];
+    NSUInteger elementKindsMask = 0;
+    NSInteger maxInlineNestingDepth = 1;
+    for (id drawableDescription in drawables) {
+        AccumulateClipboardDescriptionDrawable(drawableDescription, topLevelClasses, &elementKindsMask, &maxInlineNestingDepth, YES);
+    }
+
+    summary.drawableInfoKindsCount = MAX((NSInteger)topLevelClasses.count, 1);
+    summary.elementKindsMask = elementKindsMask > 0 ? elementKindsMask : summary.elementKindsMask;
+    summary.maxInlineNestingDepth = MAX(maxInlineNestingDepth, 1);
+    return summary;
+}
+
 @interface SVGPopoverViewController ()
 @property (nonatomic, strong) WKWebView *previewView;
 @property (nonatomic, strong) NSTextField *statusLabel;
@@ -393,22 +484,20 @@ static NSString *const kCompatibilityProfileDefaultsKey = @"CompatibilityProfile
     NSPasteboardType metadataType = @"com.apple.iWork.TSPNativeMetadata";
     NSPasteboardType descriptionType = @"com.apple.iWork.TSPDescription";
     NSPasteboardType hasNativeDrawablesType = @"com.apple.iWork.pasteboardState.hasNativeDrawables";
+    ClipboardDescriptionSummary descriptionSummary = ClipboardDescriptionSummaryFromData(clipboardDescription, drawableCount);
     NSMutableArray<NSPasteboardType> *types = [NSMutableArray arrayWithArray:@[
         nativeDataType,
         metadataType,
         descriptionType,
         hasNativeDrawablesType,
         @"com.apple.iWork.pasteboardState.hasNativeTypes",
-        @"com.apple.iWork.pasteboardState.drawableInfoKinds-1",
-        @"com.apple.iWork.pasteboardState.elementKinds-2",
-        @"com.apple.iWork.pasteboardState.countOfObject-2",
-        @"com.apple.iWork.pasteboardState.maxinlinenestingdepth-1",
+        [NSString stringWithFormat:@"com.apple.iWork.pasteboardState.drawableInfoKinds-%ld", (long)descriptionSummary.drawableInfoKindsCount],
+        [NSString stringWithFormat:@"com.apple.iWork.pasteboardState.elementKinds-%lu", (unsigned long)descriptionSummary.elementKindsMask],
+        [NSString stringWithFormat:@"com.apple.iWork.pasteboardState.countOfObject-%ld", (long)descriptionSummary.objectCount],
+        [NSString stringWithFormat:@"com.apple.iWork.pasteboardState.maxinlinenestingdepth-%ld", (long)descriptionSummary.maxInlineNestingDepth],
     ]];
-    if (drawableCount < 1) {
-        drawableCount = 1;
-    }
-    [types addObject:[NSString stringWithFormat:@"com.apple.iWork.pasteboardState.numberOfDrawables-%ld", (long)drawableCount]];
-    [types addObject:[NSString stringWithFormat:@"com.apple.iWork.pasteboardState.numberOfTopLevelDrawables-%ld", (long)drawableCount]];
+    [types addObject:[NSString stringWithFormat:@"com.apple.iWork.pasteboardState.numberOfDrawables-%ld", (long)descriptionSummary.topLevelDrawableCount]];
+    [types addObject:[NSString stringWithFormat:@"com.apple.iWork.pasteboardState.numberOfTopLevelDrawables-%ld", (long)descriptionSummary.topLevelDrawableCount]];
     if (pngData.length > 0) {
         [types addObject:NSPasteboardTypePNG];
         [types addObject:@"Apple PNG pasteboard type"];

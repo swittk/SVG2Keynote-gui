@@ -30,8 +30,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "459A278C23AA910B003D50EC"
-            BuildableName = "KeynoteSVGUI.app"
-            BlueprintName = "KeynoteSVGUI"
+            BuildableName = "SVGMenuBar.app"
+            BlueprintName = "SVGMenuBar"
             ReferencedContainer = "container:KeynoteSVGUI.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

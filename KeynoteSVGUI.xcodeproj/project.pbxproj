@@ -114,7 +114,7 @@
 		36D4055D0A4514F14F8B1337 /* common_message_creation.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = common_message_creation.cpp; path = Codec/src/svg_to_key/common_message_creation.cpp; sourceTree = "<group>"; };
 		38DA3701E4B22F99D1BEE9B5 /* strtod.cc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = strtod.cc; path = Vendor/protobuf/src/google/protobuf/io/strtod.cc; sourceTree = "<group>"; };
 		3983E482452D841B021ECA1C /* any.cc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = any.cc; path = Vendor/protobuf/src/google/protobuf/any.cc; sourceTree = "<group>"; };
-		459A278D23AA910B003D50EC /* KeynoteSVGUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeynoteSVGUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		459A278D23AA910B003D50EC /* SVGMenuBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SVGMenuBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		459A279423AA910B003D50EC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		459A279C23AA910B003D50EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		52ED8EB9BC8EAB2C058D8547 /* shape_creation_repository.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = shape_creation_repository.cpp; path = Codec/src/svg_to_key/shape_creation_repository.cpp; sourceTree = "<group>"; };
@@ -199,7 +199,7 @@
 		459A278E23AA910B003D50EC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				459A278D23AA910B003D50EC /* KeynoteSVGUI.app */,
+				459A278D23AA910B003D50EC /* SVGMenuBar.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -306,9 +306,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		459A278C23AA910B003D50EC /* KeynoteSVGUI */ = {
+		459A278C23AA910B003D50EC /* SVGMenuBar */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 459A27A023AA910B003D50EC /* Build configuration list for PBXNativeTarget "KeynoteSVGUI" */;
+			buildConfigurationList = 459A27A023AA910B003D50EC /* Build configuration list for PBXNativeTarget "SVGMenuBar" */;
 			buildPhases = (
 				459A278923AA910B003D50EC /* Sources */,
 				459A278A23AA910B003D50EC /* Frameworks */,
@@ -318,9 +318,9 @@
 			);
 			dependencies = (
 			);
-			name = KeynoteSVGUI;
-			productName = SwiftUIMenuBar;
-			productReference = 459A278D23AA910B003D50EC /* KeynoteSVGUI.app */;
+			name = SVGMenuBar;
+			productName = SVGMenuBar;
+			productReference = 459A278D23AA910B003D50EC /* SVGMenuBar.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -350,7 +350,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				459A278C23AA910B003D50EC /* KeynoteSVGUI */,
+				459A278C23AA910B003D50EC /* SVGMenuBar */,
 			);
 		};
 /* End PBXProject section */
@@ -511,7 +511,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -606,7 +606,7 @@
 					"-Wno-unused-function",
 					"-Wno-unused-parameter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = swittk.KeynoteSVGUI;
+				PRODUCT_BUNDLE_IDENTIFIER = swittk.SVGMenuBar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
@@ -649,7 +649,7 @@
 					"-Wno-unused-function",
 					"-Wno-unused-parameter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = swittk.KeynoteSVGUI;
+				PRODUCT_BUNDLE_IDENTIFIER = swittk.SVGMenuBar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
@@ -667,7 +667,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		459A27A023AA910B003D50EC /* Build configuration list for PBXNativeTarget "KeynoteSVGUI" */ = {
+		459A27A023AA910B003D50EC /* Build configuration list for PBXNativeTarget "SVGMenuBar" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				459A27A123AA910B003D50EC /* Debug */,

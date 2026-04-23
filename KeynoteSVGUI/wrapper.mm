@@ -8,6 +8,10 @@
 #include "TSPArchiveMessages.pb.h"
 #include "TSPMessages.pb.h"
 
+static NSString *const kCompatibilityVersionKey = @"version";
+static NSString *const kCompatibilityAppNameKey = @"appName";
+static NSString *const kCompatibilityDataMetadataMapIdentifierKey = @"dataMetadataMapIdentifier";
+
 static NSArray<NSNumber *> *NormalizedVersionComponentsFromString(NSString *versionString) {
     NSMutableArray<NSNumber *> *components = [NSMutableArray array];
     for (NSString *component in [versionString componentsSeparatedByString:@"."]) {
@@ -26,6 +30,30 @@ static NSArray<NSNumber *> *NormalizedVersionComponentsFromString(NSString *vers
     }
 
     return [components copy];
+}
+
+static google::protobuf::uint64 DefaultDataMetadataMapIdentifier(void) {
+    return 2641470;
+}
+
+static NSArray<NSNumber *> *NormalizedCompatibilityVersionComponents(NSArray<NSNumber *> *components) {
+    if (![components isKindOfClass:[NSArray class]] || components.count == 0) {
+        return nil;
+    }
+
+    NSMutableArray<NSNumber *> *normalized = [NSMutableArray arrayWithCapacity:MAX((NSUInteger)3, components.count)];
+    for (id component in components) {
+        if (![component isKindOfClass:[NSNumber class]]) {
+            continue;
+        }
+        [normalized addObject:@(MAX(((NSNumber *)component).integerValue, 0))];
+    }
+
+    while (normalized.count < 3) {
+        [normalized addObject:@0];
+    }
+
+    return normalized.count > 0 ? [normalized copy] : nil;
 }
 
 static NSString *InstalledKeynoteVersionString(void) {
@@ -47,6 +75,8 @@ static NSArray<NSNumber *> *InstalledKeynoteVersionComponents(void) {
     // These values are taken from real Keynote clipboard payloads on current releases.
     if (major == 13 && minor == 0 && patch == 0) {
         patch = 2;
+    } else if (major == 10 && minor == 1 && patch == 0) {
+        patch = 8;
     } else if (major == 11 && minor == 2 && patch == 0) {
         patch = 9;
     } else if (major == 11 && minor == 1 && patch == 0) {
@@ -58,6 +88,73 @@ static NSArray<NSNumber *> *InstalledKeynoteVersionComponents(void) {
 
 static NSString *InstalledClipboardApplicationName(void) {
     return [@"com.apple.Keynote " stringByAppendingString:InstalledKeynoteVersionString()];
+}
+
+static NSDictionary<NSString *, id> *CompatibilityProfileFromMetadataData(NSData *metadataData) {
+    if (metadataData.length == 0) {
+        return nil;
+    }
+
+    google::protobuf::io::CodedInputStream stream(
+        reinterpret_cast<const google::protobuf::uint8 *>(metadataData.bytes),
+        (int)metadataData.length
+    );
+
+    google::protobuf::uint64 archiveInfoSize = 0;
+    if (!stream.ReadVarint64(&archiveInfoSize)) {
+        return nil;
+    }
+
+    TSP::ArchiveInfo archiveInfo;
+    google::protobuf::io::CodedInputStream::Limit archiveLimit = stream.PushLimit((int)archiveInfoSize);
+    const bool parsedArchiveInfo = archiveInfo.ParseFromCodedStream(&stream);
+    stream.PopLimit(archiveLimit);
+    if (!parsedArchiveInfo || archiveInfo.message_infos_size() == 0) {
+        return nil;
+    }
+
+    const TSP::MessageInfo &messageInfo = archiveInfo.message_infos(0);
+    if (messageInfo.type() != 11007 || messageInfo.length() <= 0) {
+        return nil;
+    }
+
+    std::string payload;
+    payload.resize(messageInfo.length());
+    if (!stream.ReadRaw(payload.data(), messageInfo.length())) {
+        return nil;
+    }
+
+    TSP::PasteboardMetadata pasteboardMetadata;
+    if (!pasteboardMetadata.ParseFromString(payload) || !pasteboardMetadata.has_app_name()) {
+        return nil;
+    }
+
+    NSMutableArray<NSNumber *> *version = [NSMutableArray arrayWithCapacity:MAX(3, pasteboardMetadata.version_size())];
+    for (int index = 0; index < pasteboardMetadata.version_size(); ++index) {
+        [version addObject:@(MAX((NSInteger)pasteboardMetadata.version(index), 0))];
+    }
+    NSArray<NSNumber *> *normalizedVersion = NormalizedCompatibilityVersionComponents(version);
+    if (normalizedVersion == nil) {
+        return nil;
+    }
+
+    NSString *appName = [[NSString alloc] initWithBytes:pasteboardMetadata.app_name().data()
+                                                 length:pasteboardMetadata.app_name().length()
+                                               encoding:NSUTF8StringEncoding];
+    if (appName.length == 0 || ![appName hasPrefix:@"com.apple.Keynote "]) {
+        return nil;
+    }
+
+    google::protobuf::uint64 dataMetadataMapIdentifier = DefaultDataMetadataMapIdentifier();
+    if (pasteboardMetadata.has_data_metadata_map()) {
+        dataMetadataMapIdentifier = pasteboardMetadata.data_metadata_map().identifier();
+    }
+
+    return @{
+        kCompatibilityVersionKey: normalizedVersion,
+        kCompatibilityAppNameKey: appName,
+        kCompatibilityDataMetadataMapIdentifierKey: @(dataMetadataMapIdentifier),
+    };
 }
 
 static TSP::UUID *CreateUUIDMessageFromString(NSString *documentUUIDString) {
@@ -85,14 +182,20 @@ static TSP::UUID *CreateUUIDMessageFromString(NSString *documentUUIDString) {
     return uuidMessage;
 }
 
-static NSData *GenerateClipboardMetadataData(NSString *documentUUIDString) {
+static NSData *GenerateClipboardMetadataData(NSString *documentUUIDString, NSDictionary<NSString *, id> *compatibilityProfile) {
     auto *pasteboardMetadata = new TSP::PasteboardMetadata();
-    NSArray<NSNumber *> *metadataVersion = InstalledKeynoteVersionComponents();
+    NSArray<NSNumber *> *metadataVersion = NormalizedCompatibilityVersionComponents(compatibilityProfile[kCompatibilityVersionKey]);
+    if (metadataVersion == nil) {
+        metadataVersion = InstalledKeynoteVersionComponents();
+    }
     for (NSNumber *component in metadataVersion) {
         pasteboardMetadata->add_version(component.intValue);
     }
 
-    NSString *applicationName = InstalledClipboardApplicationName();
+    NSString *applicationName = compatibilityProfile[kCompatibilityAppNameKey];
+    if (![applicationName isKindOfClass:[NSString class]] || applicationName.length == 0) {
+        applicationName = InstalledClipboardApplicationName();
+    }
     pasteboardMetadata->set_allocated_app_name(new std::string(applicationName.UTF8String ?: ""));
     pasteboardMetadata->add_read_version(2);
     pasteboardMetadata->add_read_version(0);
@@ -102,7 +205,12 @@ static NSData *GenerateClipboardMetadataData(NSString *documentUUIDString) {
         pasteboardMetadata->set_allocated_source_document_uuid(uuidMessage);
     }
 
-    constexpr google::protobuf::uint64 dataMetadataMapIdentifier = 25717;
+    google::protobuf::uint64 dataMetadataMapIdentifier = DefaultDataMetadataMapIdentifier();
+    NSNumber *compatibilityIdentifier = compatibilityProfile[kCompatibilityDataMetadataMapIdentifierKey];
+    if ([compatibilityIdentifier isKindOfClass:[NSNumber class]]) {
+        dataMetadataMapIdentifier = compatibilityIdentifier.unsignedLongLongValue;
+    }
+
     auto *dataMetadataMapReference = new TSP::Reference();
     dataMetadataMapReference->set_identifier(dataMetadataMapIdentifier);
     pasteboardMetadata->set_allocated_data_metadata_map(dataMetadataMapReference);
@@ -184,7 +292,7 @@ static NSData *GenerateClipboardDescriptionData(NSInteger drawableCount) {
         [drawableDescriptions addObject:@{
             @"class": @"TSWPShapeInfo",
             @"elementKind": @2,
-            @"floatingAboveText": @1,
+            @"floatingAboveText": @YES,
             @"inlineWithText": @0,
             @"anchoredToText": @0,
             @"maxInlineNestingDepth": @1,
@@ -193,13 +301,13 @@ static NSData *GenerateClipboardDescriptionData(NSInteger drawableCount) {
     }
 
     NSDictionary *description = @{
-        @"nativeObj": @{ @"KNPasteboardNativeStorage": @1 },
+        @"nativeObj": @{ @"KNPasteboardNativeStorage": @YES },
         @"drawables": drawableDescriptions,
     };
 
     NSError *error = nil;
     NSData *data = [NSPropertyListSerialization dataWithPropertyList:description
-                                                              format:NSPropertyListBinaryFormat_v1_0
+                                                              format:NSPropertyListXMLFormat_v1_0
                                                              options:0
                                                                error:&error];
     if (data == nil) {
@@ -217,11 +325,15 @@ static NSData *GenerateClipboardDescriptionData(NSInteger drawableCount) {
 }
 
 - (NSData *)generateClipboardMetadata {
-    return [self generateClipboardMetadataWithDocumentUUIDString:NSUUID.UUID.UUIDString];
+    return [self generateClipboardMetadataWithDocumentUUIDString:NSUUID.UUID.UUIDString compatibilityProfile:nil];
 }
 
 - (NSData *)generateClipboardMetadataWithDocumentUUIDString:(NSString *)documentUUIDString {
-    return GenerateClipboardMetadataData(documentUUIDString);
+    return [self generateClipboardMetadataWithDocumentUUIDString:documentUUIDString compatibilityProfile:nil];
+}
+
+- (NSData *)generateClipboardMetadataWithDocumentUUIDString:(NSString *)documentUUIDString compatibilityProfile:(NSDictionary<NSString *,id> *)compatibilityProfile {
+    return GenerateClipboardMetadataData(documentUUIDString, compatibilityProfile);
 }
 
 - (NSData *)generateClipboardDescriptionForDrawableCount:(NSInteger)drawableCount {
@@ -247,6 +359,10 @@ static NSData *GenerateClipboardDescriptionData(NSInteger drawableCount) {
     }
 
     return [[NSString alloc] initWithBytes:svg.data() length:svg.length() encoding:NSUTF8StringEncoding];
+}
+
+- (NSDictionary<NSString *,id> *)compatibilityProfileFromClipboardMetadataData:(NSData *)metadataData {
+    return CompatibilityProfileFromMetadataData(metadataData);
 }
 
 @end

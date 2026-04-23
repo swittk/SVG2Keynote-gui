@@ -5,10 +5,13 @@
 #import "SVGPopoverViewController.h"
 #import "wrapper.h"
 
+static NSString *const kCompatibilityProfileDefaultsKey = @"CompatibilityProfile";
+
 @interface SVGPopoverViewController ()
 @property (nonatomic, strong) WKWebView *previewView;
 @property (nonatomic, strong) NSTextField *statusLabel;
 @property (nonatomic, strong) NSButton *openButton;
+@property (nonatomic, strong) NSButton *syncButton;
 @property (nonatomic, strong) NSButton *saveClipboardButton;
 @property (nonatomic, strong) NSButton *clipboardButton;
 @property (nonatomic, strong) NSButton *quitButton;
@@ -20,7 +23,7 @@
 @implementation SVGPopoverViewController
 
 - (void)loadView {
-    self.view = [[NSView alloc] initWithFrame:NSMakeRect(0.0, 0.0, 500.0, 440.0)];
+    self.view = [[NSView alloc] initWithFrame:NSMakeRect(0.0, 0.0, 660.0, 440.0)];
 }
 
 - (void)viewDidLoad {
@@ -59,6 +62,9 @@
     self.openButton = [NSButton buttonWithTitle:@"Open SVG File" target:self action:@selector(openSVG:)];
     self.openButton.translatesAutoresizingMaskIntoConstraints = NO;
 
+    self.syncButton = [NSButton buttonWithTitle:@"Resync Compatibility" target:self action:@selector(resyncCompatibility:)];
+    self.syncButton.translatesAutoresizingMaskIntoConstraints = NO;
+
     self.saveClipboardButton = [NSButton buttonWithTitle:@"Save Clipboard..." target:self action:@selector(saveClipboard:)];
     self.saveClipboardButton.translatesAutoresizingMaskIntoConstraints = NO;
 
@@ -73,6 +79,7 @@
     [self.view addSubview:previewContainer];
     [self.view addSubview:self.statusLabel];
     [self.view addSubview:self.openButton];
+    [self.view addSubview:self.syncButton];
     [self.view addSubview:self.saveClipboardButton];
     [self.view addSubview:self.quitButton];
     [self.view addSubview:self.clipboardButton];
@@ -96,8 +103,11 @@
         [self.openButton.leadingAnchor constraintEqualToAnchor:previewContainer.leadingAnchor],
         [self.openButton.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor constant:-16.0],
 
+        [self.syncButton.centerYAnchor constraintEqualToAnchor:self.openButton.centerYAnchor],
+        [self.syncButton.leadingAnchor constraintEqualToAnchor:self.openButton.trailingAnchor constant:12.0],
+
         [self.saveClipboardButton.centerYAnchor constraintEqualToAnchor:self.openButton.centerYAnchor],
-        [self.saveClipboardButton.leadingAnchor constraintEqualToAnchor:self.openButton.trailingAnchor constant:12.0],
+        [self.saveClipboardButton.leadingAnchor constraintEqualToAnchor:self.syncButton.trailingAnchor constant:12.0],
 
         [self.quitButton.centerYAnchor constraintEqualToAnchor:self.openButton.centerYAnchor],
         [self.quitButton.leadingAnchor constraintEqualToAnchor:self.saveClipboardButton.trailingAnchor constant:12.0],
@@ -111,7 +121,12 @@
 - (void)loadPlaceholder {
     self.previewReady = NO;
     self.clipboardButton.enabled = NO;
-    [self updateStatus:@"Open an SVG file to preview and copy editable Keynote shapes, or save the current clipboard back out as SVG or PNG."];
+    NSString *status = @"Open an SVG file to preview and copy editable Keynote shapes, or save the current clipboard back out as SVG or PNG.";
+    NSDictionary<NSString *, id> *compatibilityProfile = [self savedCompatibilityProfile];
+    if (compatibilityProfile.count > 0) {
+        status = [status stringByAppendingFormat:@" Active compatibility: %@.", [self compatibilitySummaryForProfile:compatibilityProfile]];
+    }
+    [self updateStatus:status];
     [self.previewView loadHTMLString:@"<!DOCTYPE html><html><body style=\"margin:0; display:flex; align-items:center; justify-content:center; min-height:100vh; font:13px -apple-system; color:#666; background:transparent;\">Select an SVG file to preview it here.</body></html>" baseURL:nil];
 }
 
@@ -190,21 +205,38 @@
     NSString *documentUUIDString = NSUUID.UUID.UUIDString;
     NSData *clipboardData = [wrapper generateClipboardForTSPNativeData:self.currentSVGString];
     NSInteger drawableCount = [wrapper drawableCountForClipboardData:clipboardData];
-    NSData *metadata = [wrapper generateClipboardMetadataWithDocumentUUIDString:documentUUIDString];
+    NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
+    NSDictionary<NSString *, id> *compatibilityProfile = [self activeCompatibilityProfileFromPasteboard:pasteboard wrapper:wrapper];
+    NSData *metadata = [wrapper generateClipboardMetadataWithDocumentUUIDString:documentUUIDString compatibilityProfile:compatibilityProfile];
     NSData *clipboardDescription = [wrapper generateClipboardDescriptionForDrawableCount:drawableCount];
 
-    self.clipboardButton.enabled = self.previewReady;
-
     if (clipboardData.length == 0 || metadata.length == 0 || clipboardDescription.length == 0) {
+        self.clipboardButton.enabled = self.previewReady;
         [self updateStatus:@"Failed to generate Keynote clipboard data from the SVG."];
         return;
     }
 
-    [self writeKeynoteClipboardData:clipboardData
-                           metadata:metadata
-                    clipboardDescription:clipboardDescription
-                      drawableCount:drawableCount];
-    [self updateStatus:@"Copied editable Keynote data to the clipboard. Paste it into Keynote with Command-V."];
+    __weak typeof(self) weakSelf = self;
+    [self capturePreviewImageDataWithCompletion:^(NSData *pngData, NSData *tiffData) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+
+        strongSelf.clipboardButton.enabled = strongSelf.previewReady;
+        [strongSelf writeKeynoteClipboardData:clipboardData
+                                     metadata:metadata
+                         clipboardDescription:clipboardDescription
+                                drawableCount:drawableCount
+                                      pngData:pngData
+                                     tiffData:tiffData];
+
+        NSString *status = @"Copied editable Keynote data to the clipboard. Paste it into Keynote with Command-V.";
+        if (compatibilityProfile.count > 0) {
+            status = [status stringByAppendingFormat:@" Using %@ compatibility.", [strongSelf compatibilitySummaryForProfile:compatibilityProfile]];
+        }
+        [strongSelf updateStatus:status];
+    }];
 }
 
 - (void)quitApp:(id)sender {
@@ -229,6 +261,70 @@
 
     NSBitmapImageRep *bitmap = [NSBitmapImageRep imageRepWithData:tiffData];
     return [bitmap representationUsingType:NSBitmapImageFileTypePNG properties:@{}];
+}
+
+- (void)resyncCompatibility:(id)sender {
+    CPP_Wrapper *wrapper = [[CPP_Wrapper alloc] init];
+    NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
+    NSDictionary<NSString *, id> *compatibilityProfile = [wrapper compatibilityProfileFromClipboardMetadataData:[pasteboard dataForType:@"com.apple.iWork.TSPNativeMetadata"]];
+    if (compatibilityProfile.count == 0) {
+        [self updateStatus:@"Copy a simple Keynote shape first, then click Resync Compatibility."];
+        return;
+    }
+
+    [[NSUserDefaults standardUserDefaults] setObject:compatibilityProfile forKey:kCompatibilityProfileDefaultsKey];
+    [self updateStatus:[NSString stringWithFormat:@"Synced compatibility to %@.", [self compatibilitySummaryForProfile:compatibilityProfile]]];
+}
+
+- (NSDictionary<NSString *, id> *)savedCompatibilityProfile {
+    id compatibilityProfile = [[NSUserDefaults standardUserDefaults] objectForKey:kCompatibilityProfileDefaultsKey];
+    return [compatibilityProfile isKindOfClass:[NSDictionary class]] ? compatibilityProfile : nil;
+}
+
+- (NSDictionary<NSString *, id> *)activeCompatibilityProfileFromPasteboard:(NSPasteboard *)pasteboard wrapper:(CPP_Wrapper *)wrapper {
+    NSDictionary<NSString *, id> *savedCompatibilityProfile = [self savedCompatibilityProfile];
+    if (savedCompatibilityProfile.count > 0) {
+        return savedCompatibilityProfile;
+    }
+
+    return [wrapper compatibilityProfileFromClipboardMetadataData:[pasteboard dataForType:@"com.apple.iWork.TSPNativeMetadata"]];
+}
+
+- (NSString *)compatibilitySummaryForProfile:(NSDictionary<NSString *, id> *)compatibilityProfile {
+    NSString *appName = compatibilityProfile[@"appName"];
+    NSArray<NSNumber *> *version = compatibilityProfile[@"version"];
+    NSString *displayName = appName;
+
+    if ([displayName hasPrefix:@"com.apple.Keynote "]) {
+        displayName = [NSString stringWithFormat:@"Keynote %@", [displayName substringFromIndex:@"com.apple.Keynote ".length]];
+    }
+
+    if ([version isKindOfClass:[NSArray class]] && version.count >= 3) {
+        return [NSString stringWithFormat:@"%@ (%@.%@.%@)", displayName ?: @"Keynote", version[0], version[1], version[2]];
+    }
+
+    return displayName.length > 0 ? displayName : @"Keynote";
+}
+
+- (void)capturePreviewImageDataWithCompletion:(void (^)(NSData *pngData, NSData *tiffData))completion {
+    if (completion == nil) {
+        return;
+    }
+
+    [self.previewView takeSnapshotWithConfiguration:nil completionHandler:^(NSImage *snapshotImage, NSError *error) {
+        void (^finishOnMain)(NSData *, NSData *) = ^(NSData *pngData, NSData *tiffData) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion(pngData, tiffData);
+            });
+        };
+
+        if (snapshotImage == nil || error != nil) {
+            finishOnMain(nil, nil);
+            return;
+        }
+
+        finishOnMain([self PNGDataForImage:snapshotImage], snapshotImage.TIFFRepresentation);
+    }];
 }
 
 - (void)saveClipboard:(id)sender {
@@ -289,7 +385,9 @@
 - (void)writeKeynoteClipboardData:(NSData *)clipboardData
                          metadata:(NSData *)metadata
              clipboardDescription:(NSData *)clipboardDescription
-                    drawableCount:(NSInteger)drawableCount {
+                    drawableCount:(NSInteger)drawableCount
+                          pngData:(NSData *)pngData
+                         tiffData:(NSData *)tiffData {
     NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
     NSPasteboardType nativeDataType = @"com.apple.iWork.TSPNativeData";
     NSPasteboardType metadataType = @"com.apple.iWork.TSPNativeMetadata";
@@ -311,15 +409,37 @@
     }
     [types addObject:[NSString stringWithFormat:@"com.apple.iWork.pasteboardState.numberOfDrawables-%ld", (long)drawableCount]];
     [types addObject:[NSString stringWithFormat:@"com.apple.iWork.pasteboardState.numberOfTopLevelDrawables-%ld", (long)drawableCount]];
+    if (pngData.length > 0) {
+        [types addObject:NSPasteboardTypePNG];
+        [types addObject:@"Apple PNG pasteboard type"];
+    }
+    if (tiffData.length > 0) {
+        [types addObject:NSPasteboardTypeTIFF];
+        [types addObject:@"NeXT TIFF v4.0 pasteboard type"];
+    }
 
     [pasteboard declareTypes:types owner:nil];
     [pasteboard setData:clipboardData forType:nativeDataType];
     [pasteboard setData:metadata forType:metadataType];
     [pasteboard setData:clipboardDescription forType:descriptionType];
+    if (pngData.length > 0) {
+        [pasteboard setData:pngData forType:NSPasteboardTypePNG];
+        [pasteboard setData:pngData forType:@"Apple PNG pasteboard type"];
+    }
+    if (tiffData.length > 0) {
+        [pasteboard setData:tiffData forType:NSPasteboardTypeTIFF];
+        [pasteboard setData:tiffData forType:@"NeXT TIFF v4.0 pasteboard type"];
+    }
 
     NSData *markerData = [NSData data];
     for (NSPasteboardType type in types) {
-        if ([type isEqualToString:nativeDataType] || [type isEqualToString:metadataType] || [type isEqualToString:descriptionType]) {
+        if ([type isEqualToString:nativeDataType] ||
+            [type isEqualToString:metadataType] ||
+            [type isEqualToString:descriptionType] ||
+            [type isEqualToString:NSPasteboardTypePNG] ||
+            [type isEqualToString:@"Apple PNG pasteboard type"] ||
+            [type isEqualToString:NSPasteboardTypeTIFF] ||
+            [type isEqualToString:@"NeXT TIFF v4.0 pasteboard type"]) {
             continue;
         }
         [pasteboard setData:markerData forType:type];
@@ -334,7 +454,12 @@
     self.previewReady = YES;
     self.clipboardButton.enabled = (self.currentSVGString.length > 0);
     NSString *fileName = self.currentFileURL.lastPathComponent ?: @"SVG";
-    [self updateStatus:[NSString stringWithFormat:@"%@ loaded. Copy the native Keynote shapes and paste them into Keynote.", fileName]];
+    NSString *status = [NSString stringWithFormat:@"%@ loaded. Copy the native Keynote shapes and paste them into Keynote.", fileName];
+    NSDictionary<NSString *, id> *compatibilityProfile = [self savedCompatibilityProfile];
+    if (compatibilityProfile.count > 0) {
+        status = [status stringByAppendingFormat:@" Active compatibility: %@.", [self compatibilitySummaryForProfile:compatibilityProfile]];
+    }
+    [self updateStatus:status];
 }
 
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {

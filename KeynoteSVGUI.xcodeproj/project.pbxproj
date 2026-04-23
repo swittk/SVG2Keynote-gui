@@ -7,21 +7,174 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		119BB0E5C03F8E4DBA980013 /* printer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2A3D288D7A9C10B98002AA3A /* printer.cc */; };
+		1335AC636BC5EFE359FF883E /* repeated_field.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0E74FA7C5487F453320D22AB /* repeated_field.cc */; };
+		1427FB54076EF2B9606D30B4 /* TSPArchiveMessages.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 938DBB81C5523385D900EDA3 /* TSPArchiveMessages.pb.cc */; };
+		1547B5125B5A8C959199F3F3 /* TSTStylePropertyArchiving.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9C0B1E41AE9F008F0298E352 /* TSTStylePropertyArchiving.pb.cc */; };
+		17ECCF6F7F0182336C8BAE04 /* arena.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2185FB914E633E3ED0FC2F7A /* arena.cc */; };
+		20CCD4E2BE423F33B30A6F8C /* TSTArchives.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 622914400177AE98AFC15E42 /* TSTArchives.pb.cc */; };
+		22447F88A153A84FC5953933 /* common.cc in Sources */ = {isa = PBXBuildFile; fileRef = C51CB9DD2A8497F689649A2F /* common.cc */; };
+		28815F065BB365743C43EA1D /* generated_message_table_driven.cc in Sources */ = {isa = PBXBuildFile; fileRef = 72E1F48961C13F8A67F65B76 /* generated_message_table_driven.cc */; };
+		29E3E58327969ABEB76F7E8F /* structurally_valid.cc in Sources */ = {isa = PBXBuildFile; fileRef = EA04053ADA1F069656F7A5BB /* structurally_valid.cc */; };
+		2B21CECADA25EB930A4E9AE1 /* any.cc in Sources */ = {isa = PBXBuildFile; fileRef = 3983E482452D841B021ECA1C /* any.cc */; };
+		2EC219BC1C571FFFF40011AC /* descriptor.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1730F5DAD725F479791061BF /* descriptor.cc */; };
+		319AF0E09B84D28B6E03395E /* stringprintf.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6D30BFA2D0E6D43CC8EF359F /* stringprintf.cc */; };
+		31ABC9F7C1F8F4E1495AE35A /* parse_context.cc in Sources */ = {isa = PBXBuildFile; fileRef = 94CB1D2887E7F58433640327 /* parse_context.cc */; };
+		31D7465D9F1560F0D108626A /* wire_format_lite.cc in Sources */ = {isa = PBXBuildFile; fileRef = F1ACB4C6236EED0356DE7891 /* wire_format_lite.cc */; };
+		32364BC576839561083252C7 /* TSWPArchives.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 35D2A66D85D5FAD6FC688EC0 /* TSWPArchives.pb.cc */; };
+		359126042C5AEDFFF17C4004 /* strtod.cc in Sources */ = {isa = PBXBuildFile; fileRef = 38DA3701E4B22F99D1BEE9B5 /* strtod.cc */; };
+		394D673085525039E5CC4F89 /* nanosvg_impl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 677A0C1F01F58E6D3DE37F38 /* nanosvg_impl.cpp */; };
+		3E6A9F93E635D33BD15D9341 /* any.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8944EF2CACE242FB0E4C40EA /* any.pb.cc */; };
+		42AA5DEBE30835E1548980B4 /* statusor.cc in Sources */ = {isa = PBXBuildFile; fileRef = 63BC1E8C1ED576DB44E23CD2 /* statusor.cc */; };
+		434942FC4C04B04E6A556988 /* unknown_field_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = 65ED32BF156D3C5DE0544A8F /* unknown_field_set.cc */; };
 		459A279523AA910B003D50EC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 459A279423AA910B003D50EC /* Assets.xcassets */; };
+		470A1E9A645E99D69FE371E3 /* TSDArchives.sos.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = B6B938B7E820DAB1F857421F /* TSDArchives.sos.pb.cc */; };
+		4E67644879C191DEC81CD4A3 /* TSAArchives.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 53860D7F3A534886EBC93CC4 /* TSAArchives.pb.cc */; };
+		516878F24CCB77208C73E339 /* int128.cc in Sources */ = {isa = PBXBuildFile; fileRef = 062519855359E1ABE3283243 /* int128.cc */; };
+		5401AD334D33C3CCDB38A666 /* implicit_weak_message.cc in Sources */ = {isa = PBXBuildFile; fileRef = E7D1FAF3DBEFD0EC098B2D1B /* implicit_weak_message.cc */; };
+		57319FBBCC9281718A70338C /* coded_stream.cc in Sources */ = {isa = PBXBuildFile; fileRef = 28E9A22FEE2B23B183D77662 /* coded_stream.cc */; };
+		5C26F4732C191F1199877607 /* TSDArchives.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 13D8B0C974DFD952730426D0 /* TSDArchives.pb.cc */; };
+		5D28685164688FC5DA4179DC /* TSWPArchives.sos.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 91AB2E5C38F60FE954DDA615 /* TSWPArchives.sos.pb.cc */; };
+		5DB93BDD4E40525E9D4A8FF7 /* zero_copy_stream_impl.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6C646DB07298990EAAAEE5BA /* zero_copy_stream_impl.cc */; };
+		63CBBEA9221AAA333C6D8311 /* svg_to_key.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 005C856F2466D4FF8989DDB2 /* svg_to_key.cpp */; };
+		666C24AD03A842B17FFCC629 /* strutil.cc in Sources */ = {isa = PBXBuildFile; fileRef = 216E9374E06099B248680418 /* strutil.cc */; };
+		69825AC0FD4FA6B99806D384 /* nanosvg_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B5322263D1F5AF5D80802FF /* nanosvg_helper.cpp */; };
+		6B7D095454EF5A57B565923E /* proto_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E84C7226400A988BA56A7607 /* proto_helper.cpp */; };
+		6E4985045E0A5BEA3531F7C6 /* any_lite.cc in Sources */ = {isa = PBXBuildFile; fileRef = E1D1ABBAF240689F9322EA18 /* any_lite.cc */; };
+		717AD15504298503AA27A7F6 /* keynote.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABA9581FEF7B0AEEA492E7D0 /* keynote.cpp */; };
+		73CE0B936539533F6CEF8BF3 /* text_format.cc in Sources */ = {isa = PBXBuildFile; fileRef = 18CADFC3A8CF3F8BDBD516AD /* text_format.cc */; };
+		74D9C926B6FB12078D13CCFB /* TSPMessages.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 849ABA0DAA2AEF262B9F4E4F /* TSPMessages.pb.cc */; };
+		74E32378D4B6F71A1CAC58C9 /* substitute.cc in Sources */ = {isa = PBXBuildFile; fileRef = EFAB1A28B68E73CE47359F11 /* substitute.cc */; };
+		74FD197D6D36425514E5EB06 /* TSCHArchives.Common.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = B104DE46A106366C44F0996C /* TSCHArchives.Common.pb.cc */; };
+		774BD966CB4E1AD3ECF926FB /* dynamic_message.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9F84871166A0122F782D4819 /* dynamic_message.cc */; };
+		7B0820B9B2B44161D03AAE9C /* field_access_listener.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9B0DFC28A14B81ED860FB588 /* field_access_listener.cc */; };
+		7B95C4A477C55843534C70DD /* descriptor_database.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8C5B1CA70ED0246F2DFBA8C4 /* descriptor_database.cc */; };
+		878BD7486626D39CC5981D49 /* wire_format.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0A58DC3C5F4F45DAF688BBB1 /* wire_format.cc */; };
+		8B518CFDF6652D386C7B38CF /* TSWPCommandArchives.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2EA90AD40A70E7B4A69A25CF /* TSWPCommandArchives.pb.cc */; };
+		92FD91DC0E7E2C5F816B617B /* generated_enum_util.cc in Sources */ = {isa = PBXBuildFile; fileRef = ABA0D40C09BD88748E313807 /* generated_enum_util.cc */; };
+		97D4599AC5A653FDBDEBA7EA /* TSSArchives.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = C7570EEAC89802148807D110 /* TSSArchives.pb.cc */; };
+		98FECCEB1BC769B9E6DC9408 /* map.cc in Sources */ = {isa = PBXBuildFile; fileRef = C554D8E8A178082E1B698A46 /* map.cc */; };
+		9A8C21634DA2EB35707D3F6B /* status.cc in Sources */ = {isa = PBXBuildFile; fileRef = EAC23AB205A77A2AF6093291 /* status.cc */; };
+		9F7B460A74A3A1069D7A6625 /* extension_set_heavy.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1186C5A7F81B8184421A447C /* extension_set_heavy.cc */; };
+		AC2BEE9AB9B24B7E1B290FF7 /* TSCHArchives.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = A812688C88CF1AF4C315821D /* TSCHArchives.pb.cc */; };
+		B1386C8BB48E3B59556058D0 /* TSSArchives.sos.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = C464400A34103F3AA92BE940 /* TSSArchives.sos.pb.cc */; };
+		B2E715ACDDF054F2046AB9A3 /* message_lite.cc in Sources */ = {isa = PBXBuildFile; fileRef = 776D7B7AC7E77154C286C4BC /* message_lite.cc */; };
+		B520A830977A33D62FD28D47 /* descriptor.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 723576F456BF0EAAD57AD537 /* descriptor.pb.cc */; };
+		B6B08BD88797DC577951E83D /* reflection_ops.cc in Sources */ = {isa = PBXBuildFile; fileRef = DE2C9E710E283BD032969B93 /* reflection_ops.cc */; };
+		B8B6EC52E7D1A0B1B8F55A0E /* generated_message_table_driven_lite.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8C89D90D33A21F059F4402D0 /* generated_message_table_driven_lite.cc */; };
+		BB589E43CF5DA20E0AF6B7AD /* TSCH3DArchives.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2B80FFCCAED0D348FB9DB123 /* TSCH3DArchives.pb.cc */; };
+		BB67CBCE35E9AC4984EDE578 /* generated_message_reflection.cc in Sources */ = {isa = PBXBuildFile; fileRef = ED3776022784FBE8436EF2E3 /* generated_message_reflection.cc */; };
+		BC431C67D624A9FF9A77A169 /* map_field.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1B4F5D24CA71931AFDD0F2C4 /* map_field.cc */; };
+		C29E62F8CA977240D2005A2D /* arenastring.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0826EF843628545FE0C0931E /* arenastring.cc */; };
+		C7885F24870199668BD4DCE8 /* generated_message_util.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2F6142C4B0EB4137EE0421F9 /* generated_message_util.cc */; };
+		C7EBECBC30D49AC18C4D6E6C /* stringpiece.cc in Sources */ = {isa = PBXBuildFile; fileRef = C966A1859679C85652480CE5 /* stringpiece.cc */; };
+		CFCC860232B1637C44ED33DD /* KNArchives.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 982978D6A78C4178AC5E7B5D /* KNArchives.pb.cc */; };
+		D016A9CA478DCA6123EE404B /* time.cc in Sources */ = {isa = PBXBuildFile; fileRef = 134B716C059288BC3836F497 /* time.cc */; };
 		D100000123AA910B003D50EC /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D100000523AA910B003D50EC /* AppDelegate.m */; };
 		D100000223AA910B003D50EC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D100000623AA910B003D50EC /* main.m */; };
 		D100000323AA910B003D50EC /* SVGPopoverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D100000823AA910B003D50EC /* SVGPopoverViewController.m */; };
+		D100000923AA910B003D50EC /* wrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = D100000B23AA910B003D50EC /* wrapper.mm */; };
+		DFA8DF10E6BB3CBA92E6709C /* TSDCommandArchives.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = F24DEE5E62B0B8D3C3422010 /* TSDCommandArchives.pb.cc */; };
+		E22125D47D5E63FC26922C88 /* message.cc in Sources */ = {isa = PBXBuildFile; fileRef = EE1DE26F6FF48C9938413A00 /* message.cc */; };
+		E33356A0E10E5AB353448F3F /* shape_creation_repository.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 52ED8EB9BC8EAB2C058D8547 /* shape_creation_repository.cpp */; };
+		E955D9C302553879FE78C158 /* extension_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = C8DC7D034954D53A1E3FFEB0 /* extension_set.cc */; };
+		EA3CC043E1D89CFAC663A3E5 /* tokenizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BC665B5B97CDB0BA403A09B5 /* tokenizer.cc */; };
+		F473AB358AF8E3B553B3831D /* zero_copy_stream_impl_lite.cc in Sources */ = {isa = PBXBuildFile; fileRef = C81BFA23245509F4F880E2C9 /* zero_copy_stream_impl_lite.cc */; };
+		F6C1E8C6B9A8458AD50F60A4 /* TSCHArchives.GEN.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = B8B70EF7541298D7D33493D6 /* TSCHArchives.GEN.pb.cc */; };
+		F800FA040950F42DD22DFDC1 /* TSCEArchives.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2D3C74987C61DD6B88899267 /* TSCEArchives.pb.cc */; };
+		F807098E425A5BEAF1279F83 /* zero_copy_stream.cc in Sources */ = {isa = PBXBuildFile; fileRef = 843BF9E4272D90D8272A60F8 /* zero_copy_stream.cc */; };
+		F92F019E98302FA0B7417FF0 /* TSKArchives.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 36A2E75E8DBB82C431CD152C /* TSKArchives.pb.cc */; };
+		FB8B7F28673A1FF9C0555BBF /* TSCHPreUFFArchives.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = 88EC337A39D99FA64CE17EAD /* TSCHPreUFFArchives.pb.cc */; };
+		FD6F4D9838975EA3AA849F5C /* common_message_creation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36D4055D0A4514F14F8B1337 /* common_message_creation.cpp */; };
+		FE7F008C88F5CA80D288EDE8 /* bytestream.cc in Sources */ = {isa = PBXBuildFile; fileRef = DEF7E23BC02D680ADE61E523 /* bytestream.cc */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		005C856F2466D4FF8989DDB2 /* svg_to_key.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = svg_to_key.cpp; path = Codec/src/svg_to_key/svg_to_key.cpp; sourceTree = "<group>"; };
+		062519855359E1ABE3283243 /* int128.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = int128.cc; path = Vendor/protobuf/src/google/protobuf/stubs/int128.cc; sourceTree = "<group>"; };
+		0826EF843628545FE0C0931E /* arenastring.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = arenastring.cc; path = Vendor/protobuf/src/google/protobuf/arenastring.cc; sourceTree = "<group>"; };
+		0A58DC3C5F4F45DAF688BBB1 /* wire_format.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = wire_format.cc; path = Vendor/protobuf/src/google/protobuf/wire_format.cc; sourceTree = "<group>"; };
+		0E74FA7C5487F453320D22AB /* repeated_field.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = repeated_field.cc; path = Vendor/protobuf/src/google/protobuf/repeated_field.cc; sourceTree = "<group>"; };
+		1186C5A7F81B8184421A447C /* extension_set_heavy.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = extension_set_heavy.cc; path = Vendor/protobuf/src/google/protobuf/extension_set_heavy.cc; sourceTree = "<group>"; };
+		134B716C059288BC3836F497 /* time.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = time.cc; path = Vendor/protobuf/src/google/protobuf/stubs/time.cc; sourceTree = "<group>"; };
+		13D8B0C974DFD952730426D0 /* TSDArchives.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSDArchives.pb.cc; path = "Vendor/keynote-protos/gen/TSDArchives.pb.cc"; sourceTree = "<group>"; };
+		1730F5DAD725F479791061BF /* descriptor.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = descriptor.cc; path = Vendor/protobuf/src/google/protobuf/descriptor.cc; sourceTree = "<group>"; };
+		18CADFC3A8CF3F8BDBD516AD /* text_format.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = text_format.cc; path = Vendor/protobuf/src/google/protobuf/text_format.cc; sourceTree = "<group>"; };
+		1B4F5D24CA71931AFDD0F2C4 /* map_field.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = map_field.cc; path = Vendor/protobuf/src/google/protobuf/map_field.cc; sourceTree = "<group>"; };
+		216E9374E06099B248680418 /* strutil.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = strutil.cc; path = Vendor/protobuf/src/google/protobuf/stubs/strutil.cc; sourceTree = "<group>"; };
+		2185FB914E633E3ED0FC2F7A /* arena.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = arena.cc; path = Vendor/protobuf/src/google/protobuf/arena.cc; sourceTree = "<group>"; };
+		28E9A22FEE2B23B183D77662 /* coded_stream.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = coded_stream.cc; path = Vendor/protobuf/src/google/protobuf/io/coded_stream.cc; sourceTree = "<group>"; };
+		2A3D288D7A9C10B98002AA3A /* printer.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = printer.cc; path = Vendor/protobuf/src/google/protobuf/io/printer.cc; sourceTree = "<group>"; };
+		2B80FFCCAED0D348FB9DB123 /* TSCH3DArchives.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSCH3DArchives.pb.cc; path = "Vendor/keynote-protos/gen/TSCH3DArchives.pb.cc"; sourceTree = "<group>"; };
+		2D3C74987C61DD6B88899267 /* TSCEArchives.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSCEArchives.pb.cc; path = "Vendor/keynote-protos/gen/TSCEArchives.pb.cc"; sourceTree = "<group>"; };
+		2EA90AD40A70E7B4A69A25CF /* TSWPCommandArchives.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSWPCommandArchives.pb.cc; path = "Vendor/keynote-protos/gen/TSWPCommandArchives.pb.cc"; sourceTree = "<group>"; };
+		2F6142C4B0EB4137EE0421F9 /* generated_message_util.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = generated_message_util.cc; path = Vendor/protobuf/src/google/protobuf/generated_message_util.cc; sourceTree = "<group>"; };
+		35D2A66D85D5FAD6FC688EC0 /* TSWPArchives.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSWPArchives.pb.cc; path = "Vendor/keynote-protos/gen/TSWPArchives.pb.cc"; sourceTree = "<group>"; };
+		36A2E75E8DBB82C431CD152C /* TSKArchives.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSKArchives.pb.cc; path = "Vendor/keynote-protos/gen/TSKArchives.pb.cc"; sourceTree = "<group>"; };
+		36D4055D0A4514F14F8B1337 /* common_message_creation.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = common_message_creation.cpp; path = Codec/src/svg_to_key/common_message_creation.cpp; sourceTree = "<group>"; };
+		38DA3701E4B22F99D1BEE9B5 /* strtod.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = strtod.cc; path = Vendor/protobuf/src/google/protobuf/io/strtod.cc; sourceTree = "<group>"; };
+		3983E482452D841B021ECA1C /* any.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = any.cc; path = Vendor/protobuf/src/google/protobuf/any.cc; sourceTree = "<group>"; };
 		459A278D23AA910B003D50EC /* KeynoteSVGUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeynoteSVGUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		459A279423AA910B003D50EC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		459A279C23AA910B003D50EC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		52ED8EB9BC8EAB2C058D8547 /* shape_creation_repository.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = shape_creation_repository.cpp; path = Codec/src/svg_to_key/shape_creation_repository.cpp; sourceTree = "<group>"; };
+		53860D7F3A534886EBC93CC4 /* TSAArchives.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSAArchives.pb.cc; path = "Vendor/keynote-protos/gen/TSAArchives.pb.cc"; sourceTree = "<group>"; };
+		622914400177AE98AFC15E42 /* TSTArchives.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSTArchives.pb.cc; path = "Vendor/keynote-protos/gen/TSTArchives.pb.cc"; sourceTree = "<group>"; };
+		63BC1E8C1ED576DB44E23CD2 /* statusor.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = statusor.cc; path = Vendor/protobuf/src/google/protobuf/stubs/statusor.cc; sourceTree = "<group>"; };
+		65ED32BF156D3C5DE0544A8F /* unknown_field_set.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = unknown_field_set.cc; path = Vendor/protobuf/src/google/protobuf/unknown_field_set.cc; sourceTree = "<group>"; };
+		677A0C1F01F58E6D3DE37F38 /* nanosvg_impl.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = nanosvg_impl.cpp; path = Codec/lib/nanosvg/src/nanosvg_impl.cpp; sourceTree = "<group>"; };
+		6B5322263D1F5AF5D80802FF /* nanosvg_helper.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = nanosvg_helper.cpp; path = Codec/src/svg_to_key/nanosvg_helper.cpp; sourceTree = "<group>"; };
+		6C646DB07298990EAAAEE5BA /* zero_copy_stream_impl.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = zero_copy_stream_impl.cc; path = Vendor/protobuf/src/google/protobuf/io/zero_copy_stream_impl.cc; sourceTree = "<group>"; };
+		6D30BFA2D0E6D43CC8EF359F /* stringprintf.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = stringprintf.cc; path = Vendor/protobuf/src/google/protobuf/stubs/stringprintf.cc; sourceTree = "<group>"; };
+		723576F456BF0EAAD57AD537 /* descriptor.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = descriptor.pb.cc; path = Vendor/protobuf/src/google/protobuf/descriptor.pb.cc; sourceTree = "<group>"; };
+		72E1F48961C13F8A67F65B76 /* generated_message_table_driven.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = generated_message_table_driven.cc; path = Vendor/protobuf/src/google/protobuf/generated_message_table_driven.cc; sourceTree = "<group>"; };
+		776D7B7AC7E77154C286C4BC /* message_lite.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = message_lite.cc; path = Vendor/protobuf/src/google/protobuf/message_lite.cc; sourceTree = "<group>"; };
+		843BF9E4272D90D8272A60F8 /* zero_copy_stream.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = zero_copy_stream.cc; path = Vendor/protobuf/src/google/protobuf/io/zero_copy_stream.cc; sourceTree = "<group>"; };
+		849ABA0DAA2AEF262B9F4E4F /* TSPMessages.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSPMessages.pb.cc; path = "Vendor/keynote-protos/gen/TSPMessages.pb.cc"; sourceTree = "<group>"; };
+		88EC337A39D99FA64CE17EAD /* TSCHPreUFFArchives.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSCHPreUFFArchives.pb.cc; path = "Vendor/keynote-protos/gen/TSCHPreUFFArchives.pb.cc"; sourceTree = "<group>"; };
+		8944EF2CACE242FB0E4C40EA /* any.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = any.pb.cc; path = Vendor/protobuf/src/google/protobuf/any.pb.cc; sourceTree = "<group>"; };
+		8C5B1CA70ED0246F2DFBA8C4 /* descriptor_database.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = descriptor_database.cc; path = Vendor/protobuf/src/google/protobuf/descriptor_database.cc; sourceTree = "<group>"; };
+		8C89D90D33A21F059F4402D0 /* generated_message_table_driven_lite.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = generated_message_table_driven_lite.cc; path = Vendor/protobuf/src/google/protobuf/generated_message_table_driven_lite.cc; sourceTree = "<group>"; };
+		91AB2E5C38F60FE954DDA615 /* TSWPArchives.sos.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSWPArchives.sos.pb.cc; path = "Vendor/keynote-protos/gen/TSWPArchives.sos.pb.cc"; sourceTree = "<group>"; };
+		938DBB81C5523385D900EDA3 /* TSPArchiveMessages.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSPArchiveMessages.pb.cc; path = "Vendor/keynote-protos/gen/TSPArchiveMessages.pb.cc"; sourceTree = "<group>"; };
+		94CB1D2887E7F58433640327 /* parse_context.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = parse_context.cc; path = Vendor/protobuf/src/google/protobuf/parse_context.cc; sourceTree = "<group>"; };
+		982978D6A78C4178AC5E7B5D /* KNArchives.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = KNArchives.pb.cc; path = "Vendor/keynote-protos/gen/KNArchives.pb.cc"; sourceTree = "<group>"; };
+		9B0DFC28A14B81ED860FB588 /* field_access_listener.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = field_access_listener.cc; path = Vendor/protobuf/src/google/protobuf/field_access_listener.cc; sourceTree = "<group>"; };
+		9C0B1E41AE9F008F0298E352 /* TSTStylePropertyArchiving.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSTStylePropertyArchiving.pb.cc; path = "Vendor/keynote-protos/gen/TSTStylePropertyArchiving.pb.cc"; sourceTree = "<group>"; };
+		9F84871166A0122F782D4819 /* dynamic_message.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = dynamic_message.cc; path = Vendor/protobuf/src/google/protobuf/dynamic_message.cc; sourceTree = "<group>"; };
+		A812688C88CF1AF4C315821D /* TSCHArchives.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSCHArchives.pb.cc; path = "Vendor/keynote-protos/gen/TSCHArchives.pb.cc"; sourceTree = "<group>"; };
+		ABA0D40C09BD88748E313807 /* generated_enum_util.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = generated_enum_util.cc; path = Vendor/protobuf/src/google/protobuf/generated_enum_util.cc; sourceTree = "<group>"; };
+		ABA9581FEF7B0AEEA492E7D0 /* keynote.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = keynote.cpp; path = Codec/keynote.cpp; sourceTree = "<group>"; };
+		B104DE46A106366C44F0996C /* TSCHArchives.Common.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSCHArchives.Common.pb.cc; path = "Vendor/keynote-protos/gen/TSCHArchives.Common.pb.cc"; sourceTree = "<group>"; };
+		B6B938B7E820DAB1F857421F /* TSDArchives.sos.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSDArchives.sos.pb.cc; path = "Vendor/keynote-protos/gen/TSDArchives.sos.pb.cc"; sourceTree = "<group>"; };
+		B8B70EF7541298D7D33493D6 /* TSCHArchives.GEN.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSCHArchives.GEN.pb.cc; path = "Vendor/keynote-protos/gen/TSCHArchives.GEN.pb.cc"; sourceTree = "<group>"; };
+		BC665B5B97CDB0BA403A09B5 /* tokenizer.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = tokenizer.cc; path = Vendor/protobuf/src/google/protobuf/io/tokenizer.cc; sourceTree = "<group>"; };
+		C464400A34103F3AA92BE940 /* TSSArchives.sos.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSSArchives.sos.pb.cc; path = "Vendor/keynote-protos/gen/TSSArchives.sos.pb.cc"; sourceTree = "<group>"; };
+		C51CB9DD2A8497F689649A2F /* common.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = common.cc; path = Vendor/protobuf/src/google/protobuf/stubs/common.cc; sourceTree = "<group>"; };
+		C554D8E8A178082E1B698A46 /* map.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = map.cc; path = Vendor/protobuf/src/google/protobuf/map.cc; sourceTree = "<group>"; };
+		C7570EEAC89802148807D110 /* TSSArchives.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSSArchives.pb.cc; path = "Vendor/keynote-protos/gen/TSSArchives.pb.cc"; sourceTree = "<group>"; };
+		C81BFA23245509F4F880E2C9 /* zero_copy_stream_impl_lite.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = zero_copy_stream_impl_lite.cc; path = Vendor/protobuf/src/google/protobuf/io/zero_copy_stream_impl_lite.cc; sourceTree = "<group>"; };
+		C8DC7D034954D53A1E3FFEB0 /* extension_set.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = extension_set.cc; path = Vendor/protobuf/src/google/protobuf/extension_set.cc; sourceTree = "<group>"; };
+		C966A1859679C85652480CE5 /* stringpiece.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = stringpiece.cc; path = Vendor/protobuf/src/google/protobuf/stubs/stringpiece.cc; sourceTree = "<group>"; };
 		D100000423AA910B003D50EC /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		D100000523AA910B003D50EC /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		D100000623AA910B003D50EC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		D100000723AA910B003D50EC /* SVGPopoverViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SVGPopoverViewController.h; sourceTree = "<group>"; };
 		D100000823AA910B003D50EC /* SVGPopoverViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SVGPopoverViewController.m; sourceTree = "<group>"; };
+		D100000A23AA910B003D50EC /* wrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = wrapper.h; sourceTree = "<group>"; };
+		D100000B23AA910B003D50EC /* wrapper.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = wrapper.mm; sourceTree = "<group>"; };
+		DE2C9E710E283BD032969B93 /* reflection_ops.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = reflection_ops.cc; path = Vendor/protobuf/src/google/protobuf/reflection_ops.cc; sourceTree = "<group>"; };
+		DEF7E23BC02D680ADE61E523 /* bytestream.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = bytestream.cc; path = Vendor/protobuf/src/google/protobuf/stubs/bytestream.cc; sourceTree = "<group>"; };
+		E1D1ABBAF240689F9322EA18 /* any_lite.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = any_lite.cc; path = Vendor/protobuf/src/google/protobuf/any_lite.cc; sourceTree = "<group>"; };
+		E7D1FAF3DBEFD0EC098B2D1B /* implicit_weak_message.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = implicit_weak_message.cc; path = Vendor/protobuf/src/google/protobuf/implicit_weak_message.cc; sourceTree = "<group>"; };
+		E84C7226400A988BA56A7607 /* proto_helper.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = proto_helper.cpp; path = Codec/proto_helper.cpp; sourceTree = "<group>"; };
+		EA04053ADA1F069656F7A5BB /* structurally_valid.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = structurally_valid.cc; path = Vendor/protobuf/src/google/protobuf/stubs/structurally_valid.cc; sourceTree = "<group>"; };
+		EAC23AB205A77A2AF6093291 /* status.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = status.cc; path = Vendor/protobuf/src/google/protobuf/stubs/status.cc; sourceTree = "<group>"; };
+		ED3776022784FBE8436EF2E3 /* generated_message_reflection.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = generated_message_reflection.cc; path = Vendor/protobuf/src/google/protobuf/generated_message_reflection.cc; sourceTree = "<group>"; };
+		EE1DE26F6FF48C9938413A00 /* message.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = message.cc; path = Vendor/protobuf/src/google/protobuf/message.cc; sourceTree = "<group>"; };
+		EFAB1A28B68E73CE47359F11 /* substitute.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = substitute.cc; path = Vendor/protobuf/src/google/protobuf/stubs/substitute.cc; sourceTree = "<group>"; };
+		F1ACB4C6236EED0356DE7891 /* wire_format_lite.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = wire_format_lite.cc; path = Vendor/protobuf/src/google/protobuf/wire_format_lite.cc; sourceTree = "<group>"; };
+		F24DEE5E62B0B8D3C3422010 /* TSDCommandArchives.pb.cc */ = {isa = PBXFileReference; includeInIndex = 1; name = TSDCommandArchives.pb.cc; path = "Vendor/keynote-protos/gen/TSDCommandArchives.pb.cc"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,11 +211,96 @@
 				D100000523AA910B003D50EC /* AppDelegate.m */,
 				D100000723AA910B003D50EC /* SVGPopoverViewController.h */,
 				D100000823AA910B003D50EC /* SVGPopoverViewController.m */,
+				D100000A23AA910B003D50EC /* wrapper.h */,
+				D100000B23AA910B003D50EC /* wrapper.mm */,
 				D100000623AA910B003D50EC /* main.m */,
 				459A279423AA910B003D50EC /* Assets.xcassets */,
 				459A279C23AA910B003D50EC /* Info.plist */,
+				8E737A44002884C42A754820 /* NativeCodecSources */,
 			);
 			path = KeynoteSVGUI;
+			sourceTree = "<group>";
+		};
+		8E737A44002884C42A754820 /* NativeCodecSources */ = {
+			isa = PBXGroup;
+			children = (
+				ABA9581FEF7B0AEEA492E7D0 /* keynote.cpp */,
+				E84C7226400A988BA56A7607 /* proto_helper.cpp */,
+				36D4055D0A4514F14F8B1337 /* common_message_creation.cpp */,
+				6B5322263D1F5AF5D80802FF /* nanosvg_helper.cpp */,
+				52ED8EB9BC8EAB2C058D8547 /* shape_creation_repository.cpp */,
+				005C856F2466D4FF8989DDB2 /* svg_to_key.cpp */,
+				677A0C1F01F58E6D3DE37F38 /* nanosvg_impl.cpp */,
+				982978D6A78C4178AC5E7B5D /* KNArchives.pb.cc */,
+				53860D7F3A534886EBC93CC4 /* TSAArchives.pb.cc */,
+				2D3C74987C61DD6B88899267 /* TSCEArchives.pb.cc */,
+				2B80FFCCAED0D348FB9DB123 /* TSCH3DArchives.pb.cc */,
+				B104DE46A106366C44F0996C /* TSCHArchives.Common.pb.cc */,
+				B8B70EF7541298D7D33493D6 /* TSCHArchives.GEN.pb.cc */,
+				A812688C88CF1AF4C315821D /* TSCHArchives.pb.cc */,
+				88EC337A39D99FA64CE17EAD /* TSCHPreUFFArchives.pb.cc */,
+				13D8B0C974DFD952730426D0 /* TSDArchives.pb.cc */,
+				B6B938B7E820DAB1F857421F /* TSDArchives.sos.pb.cc */,
+				F24DEE5E62B0B8D3C3422010 /* TSDCommandArchives.pb.cc */,
+				36A2E75E8DBB82C431CD152C /* TSKArchives.pb.cc */,
+				938DBB81C5523385D900EDA3 /* TSPArchiveMessages.pb.cc */,
+				849ABA0DAA2AEF262B9F4E4F /* TSPMessages.pb.cc */,
+				C7570EEAC89802148807D110 /* TSSArchives.pb.cc */,
+				C464400A34103F3AA92BE940 /* TSSArchives.sos.pb.cc */,
+				622914400177AE98AFC15E42 /* TSTArchives.pb.cc */,
+				9C0B1E41AE9F008F0298E352 /* TSTStylePropertyArchiving.pb.cc */,
+				35D2A66D85D5FAD6FC688EC0 /* TSWPArchives.pb.cc */,
+				91AB2E5C38F60FE954DDA615 /* TSWPArchives.sos.pb.cc */,
+				2EA90AD40A70E7B4A69A25CF /* TSWPCommandArchives.pb.cc */,
+				E1D1ABBAF240689F9322EA18 /* any_lite.cc */,
+				2185FB914E633E3ED0FC2F7A /* arena.cc */,
+				0826EF843628545FE0C0931E /* arenastring.cc */,
+				1730F5DAD725F479791061BF /* descriptor.cc */,
+				723576F456BF0EAAD57AD537 /* descriptor.pb.cc */,
+				8C5B1CA70ED0246F2DFBA8C4 /* descriptor_database.cc */,
+				9F84871166A0122F782D4819 /* dynamic_message.cc */,
+				C8DC7D034954D53A1E3FFEB0 /* extension_set.cc */,
+				1186C5A7F81B8184421A447C /* extension_set_heavy.cc */,
+				9B0DFC28A14B81ED860FB588 /* field_access_listener.cc */,
+				ABA0D40C09BD88748E313807 /* generated_enum_util.cc */,
+				ED3776022784FBE8436EF2E3 /* generated_message_reflection.cc */,
+				72E1F48961C13F8A67F65B76 /* generated_message_table_driven.cc */,
+				8C89D90D33A21F059F4402D0 /* generated_message_table_driven_lite.cc */,
+				2F6142C4B0EB4137EE0421F9 /* generated_message_util.cc */,
+				E7D1FAF3DBEFD0EC098B2D1B /* implicit_weak_message.cc */,
+				28E9A22FEE2B23B183D77662 /* coded_stream.cc */,
+				2A3D288D7A9C10B98002AA3A /* printer.cc */,
+				38DA3701E4B22F99D1BEE9B5 /* strtod.cc */,
+				BC665B5B97CDB0BA403A09B5 /* tokenizer.cc */,
+				843BF9E4272D90D8272A60F8 /* zero_copy_stream.cc */,
+				6C646DB07298990EAAAEE5BA /* zero_copy_stream_impl.cc */,
+				C81BFA23245509F4F880E2C9 /* zero_copy_stream_impl_lite.cc */,
+				C554D8E8A178082E1B698A46 /* map.cc */,
+				1B4F5D24CA71931AFDD0F2C4 /* map_field.cc */,
+				EE1DE26F6FF48C9938413A00 /* message.cc */,
+				776D7B7AC7E77154C286C4BC /* message_lite.cc */,
+				94CB1D2887E7F58433640327 /* parse_context.cc */,
+				DE2C9E710E283BD032969B93 /* reflection_ops.cc */,
+				0E74FA7C5487F453320D22AB /* repeated_field.cc */,
+				DEF7E23BC02D680ADE61E523 /* bytestream.cc */,
+				C51CB9DD2A8497F689649A2F /* common.cc */,
+				062519855359E1ABE3283243 /* int128.cc */,
+				EAC23AB205A77A2AF6093291 /* status.cc */,
+				63BC1E8C1ED576DB44E23CD2 /* statusor.cc */,
+				C966A1859679C85652480CE5 /* stringpiece.cc */,
+				6D30BFA2D0E6D43CC8EF359F /* stringprintf.cc */,
+				EA04053ADA1F069656F7A5BB /* structurally_valid.cc */,
+				216E9374E06099B248680418 /* strutil.cc */,
+				EFAB1A28B68E73CE47359F11 /* substitute.cc */,
+				134B716C059288BC3836F497 /* time.cc */,
+				65ED32BF156D3C5DE0544A8F /* unknown_field_set.cc */,
+				0A58DC3C5F4F45DAF688BBB1 /* wire_format.cc */,
+				F1ACB4C6236EED0356DE7891 /* wire_format_lite.cc */,
+				18CADFC3A8CF3F8BDBD516AD /* text_format.cc */,
+				3983E482452D841B021ECA1C /* any.cc */,
+				8944EF2CACE242FB0E4C40EA /* any.pb.cc */,
+			);
+			name = NativeCodecSources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -81,8 +319,6 @@
 			dependencies = (
 			);
 			name = KeynoteSVGUI;
-			packageProductDependencies = (
-			);
 			productName = SwiftUIMenuBar;
 			productReference = 459A278D23AA910B003D50EC /* KeynoteSVGUI.app */;
 			productType = "com.apple.product-type.application";
@@ -110,8 +346,6 @@
 				Base,
 			);
 			mainGroup = 459A278423AA910A003D50EC;
-			packageReferences = (
-			);
 			productRefGroup = 459A278E23AA910B003D50EC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -140,6 +374,82 @@
 				D100000123AA910B003D50EC /* AppDelegate.m in Sources */,
 				D100000223AA910B003D50EC /* main.m in Sources */,
 				D100000323AA910B003D50EC /* SVGPopoverViewController.m in Sources */,
+				D100000923AA910B003D50EC /* wrapper.mm in Sources */,
+				717AD15504298503AA27A7F6 /* keynote.cpp in Sources */,
+				6B7D095454EF5A57B565923E /* proto_helper.cpp in Sources */,
+				FD6F4D9838975EA3AA849F5C /* common_message_creation.cpp in Sources */,
+				69825AC0FD4FA6B99806D384 /* nanosvg_helper.cpp in Sources */,
+				E33356A0E10E5AB353448F3F /* shape_creation_repository.cpp in Sources */,
+				63CBBEA9221AAA333C6D8311 /* svg_to_key.cpp in Sources */,
+				394D673085525039E5CC4F89 /* nanosvg_impl.cpp in Sources */,
+				CFCC860232B1637C44ED33DD /* KNArchives.pb.cc in Sources */,
+				4E67644879C191DEC81CD4A3 /* TSAArchives.pb.cc in Sources */,
+				F800FA040950F42DD22DFDC1 /* TSCEArchives.pb.cc in Sources */,
+				BB589E43CF5DA20E0AF6B7AD /* TSCH3DArchives.pb.cc in Sources */,
+				74FD197D6D36425514E5EB06 /* TSCHArchives.Common.pb.cc in Sources */,
+				F6C1E8C6B9A8458AD50F60A4 /* TSCHArchives.GEN.pb.cc in Sources */,
+				AC2BEE9AB9B24B7E1B290FF7 /* TSCHArchives.pb.cc in Sources */,
+				FB8B7F28673A1FF9C0555BBF /* TSCHPreUFFArchives.pb.cc in Sources */,
+				5C26F4732C191F1199877607 /* TSDArchives.pb.cc in Sources */,
+				470A1E9A645E99D69FE371E3 /* TSDArchives.sos.pb.cc in Sources */,
+				DFA8DF10E6BB3CBA92E6709C /* TSDCommandArchives.pb.cc in Sources */,
+				F92F019E98302FA0B7417FF0 /* TSKArchives.pb.cc in Sources */,
+				1427FB54076EF2B9606D30B4 /* TSPArchiveMessages.pb.cc in Sources */,
+				74D9C926B6FB12078D13CCFB /* TSPMessages.pb.cc in Sources */,
+				97D4599AC5A653FDBDEBA7EA /* TSSArchives.pb.cc in Sources */,
+				B1386C8BB48E3B59556058D0 /* TSSArchives.sos.pb.cc in Sources */,
+				20CCD4E2BE423F33B30A6F8C /* TSTArchives.pb.cc in Sources */,
+				1547B5125B5A8C959199F3F3 /* TSTStylePropertyArchiving.pb.cc in Sources */,
+				32364BC576839561083252C7 /* TSWPArchives.pb.cc in Sources */,
+				5D28685164688FC5DA4179DC /* TSWPArchives.sos.pb.cc in Sources */,
+				8B518CFDF6652D386C7B38CF /* TSWPCommandArchives.pb.cc in Sources */,
+				6E4985045E0A5BEA3531F7C6 /* any_lite.cc in Sources */,
+				17ECCF6F7F0182336C8BAE04 /* arena.cc in Sources */,
+				C29E62F8CA977240D2005A2D /* arenastring.cc in Sources */,
+				2EC219BC1C571FFFF40011AC /* descriptor.cc in Sources */,
+				B520A830977A33D62FD28D47 /* descriptor.pb.cc in Sources */,
+				7B95C4A477C55843534C70DD /* descriptor_database.cc in Sources */,
+				774BD966CB4E1AD3ECF926FB /* dynamic_message.cc in Sources */,
+				E955D9C302553879FE78C158 /* extension_set.cc in Sources */,
+				9F7B460A74A3A1069D7A6625 /* extension_set_heavy.cc in Sources */,
+				7B0820B9B2B44161D03AAE9C /* field_access_listener.cc in Sources */,
+				92FD91DC0E7E2C5F816B617B /* generated_enum_util.cc in Sources */,
+				BB67CBCE35E9AC4984EDE578 /* generated_message_reflection.cc in Sources */,
+				28815F065BB365743C43EA1D /* generated_message_table_driven.cc in Sources */,
+				B8B6EC52E7D1A0B1B8F55A0E /* generated_message_table_driven_lite.cc in Sources */,
+				C7885F24870199668BD4DCE8 /* generated_message_util.cc in Sources */,
+				5401AD334D33C3CCDB38A666 /* implicit_weak_message.cc in Sources */,
+				57319FBBCC9281718A70338C /* coded_stream.cc in Sources */,
+				119BB0E5C03F8E4DBA980013 /* printer.cc in Sources */,
+				359126042C5AEDFFF17C4004 /* strtod.cc in Sources */,
+				EA3CC043E1D89CFAC663A3E5 /* tokenizer.cc in Sources */,
+				F807098E425A5BEAF1279F83 /* zero_copy_stream.cc in Sources */,
+				5DB93BDD4E40525E9D4A8FF7 /* zero_copy_stream_impl.cc in Sources */,
+				F473AB358AF8E3B553B3831D /* zero_copy_stream_impl_lite.cc in Sources */,
+				98FECCEB1BC769B9E6DC9408 /* map.cc in Sources */,
+				BC431C67D624A9FF9A77A169 /* map_field.cc in Sources */,
+				E22125D47D5E63FC26922C88 /* message.cc in Sources */,
+				B2E715ACDDF054F2046AB9A3 /* message_lite.cc in Sources */,
+				31ABC9F7C1F8F4E1495AE35A /* parse_context.cc in Sources */,
+				B6B08BD88797DC577951E83D /* reflection_ops.cc in Sources */,
+				1335AC636BC5EFE359FF883E /* repeated_field.cc in Sources */,
+				FE7F008C88F5CA80D288EDE8 /* bytestream.cc in Sources */,
+				22447F88A153A84FC5953933 /* common.cc in Sources */,
+				516878F24CCB77208C73E339 /* int128.cc in Sources */,
+				9A8C21634DA2EB35707D3F6B /* status.cc in Sources */,
+				42AA5DEBE30835E1548980B4 /* statusor.cc in Sources */,
+				C7EBECBC30D49AC18C4D6E6C /* stringpiece.cc in Sources */,
+				319AF0E09B84D28B6E03395E /* stringprintf.cc in Sources */,
+				29E3E58327969ABEB76F7E8F /* structurally_valid.cc in Sources */,
+				666C24AD03A842B17FFCC629 /* strutil.cc in Sources */,
+				74E32378D4B6F71A1CAC58C9 /* substitute.cc in Sources */,
+				D016A9CA478DCA6123EE404B /* time.cc in Sources */,
+				434942FC4C04B04E6A556988 /* unknown_field_set.cc in Sources */,
+				878BD7486626D39CC5981D49 /* wire_format.cc in Sources */,
+				31D7465D9F1560F0D108626A /* wire_format_lite.cc in Sources */,
+				73CE0B936539533F6CEF8BF3 /* text_format.cc in Sources */,
+				2B21CECADA25EB930A4E9AE1 /* any.cc in Sources */,
+				3E6A9F93E635D33BD15D9341 /* any.pb.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -153,7 +463,7 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -198,14 +508,14 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-					MACOSX_DEPLOYMENT_TARGET = 11.3;
-					MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-					MTL_FAST_MATH = YES;
-					ONLY_ACTIVE_ARCH = YES;
-					SDKROOT = macosx;
-				};
-				name = Debug;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
 			};
+			name = Debug;
+		};
 		459A279F23AA910B003D50EC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -213,7 +523,7 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -251,32 +561,51 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-					GCC_WARN_UNUSED_VARIABLE = YES;
-					MACOSX_DEPLOYMENT_TARGET = 11.3;
-					MTL_ENABLE_DEBUG_INFO = NO;
-					MTL_FAST_MATH = YES;
-					SDKROOT = macosx;
-				};
-				name = Release;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
 			};
+			name = Release;
+		};
 		459A27A123AA910B003D50EC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "";
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = "";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/KeynoteSVGUI/Codec",
+					"$(SRCROOT)/KeynoteSVGUI/Codec/lib/nanosvg/src",
+					"$(SRCROOT)/KeynoteSVGUI/Vendor/keynote-protos/gen",
+					"$(SRCROOT)/KeynoteSVGUI/Vendor/protobuf/src",
+				);
 				INFOPLIST_FILE = KeynoteSVGUI/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DHAVE_PTHREAD=1",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(inherited)",
+					"-DHAVE_PTHREAD=1",
+					"-Wno-deprecated-declarations",
+					"-Wno-unused-function",
+					"-Wno-unused-parameter",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = jonath4n.KeynoteSVGUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -287,20 +616,39 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "";
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = "";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/KeynoteSVGUI/Codec",
+					"$(SRCROOT)/KeynoteSVGUI/Codec/lib/nanosvg/src",
+					"$(SRCROOT)/KeynoteSVGUI/Vendor/keynote-protos/gen",
+					"$(SRCROOT)/KeynoteSVGUI/Vendor/protobuf/src",
+				);
 				INFOPLIST_FILE = KeynoteSVGUI/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DHAVE_PTHREAD=1",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(inherited)",
+					"-DHAVE_PTHREAD=1",
+					"-Wno-deprecated-declarations",
+					"-Wno-unused-function",
+					"-Wno-unused-parameter",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = jonath4n.KeynoteSVGUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -329,7 +677,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
 	};
 	rootObject = 459A278523AA910A003D50EC /* Project object */;
 }

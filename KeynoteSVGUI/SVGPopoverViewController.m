@@ -160,8 +160,8 @@
     self.clipboardButton.enabled = NO;
 
     [self updateStatus:[NSString stringWithFormat:@"Loading %@…", selectedURL.lastPathComponent ?: @"SVG"]];
-    NSString *html = [self HTMLDocumentForSVGString:svgString];
-    [self.previewView loadHTMLString:html baseURL:selectedURL.URLByDeletingLastPathComponent];
+    NSURL *readAccessURL = selectedURL.URLByDeletingLastPathComponent ?: selectedURL;
+    [self.previewView loadFileURL:selectedURL allowingReadAccessToURL:readAccessURL];
 }
 
 - (void)copyToClipboard:(id)sender {
@@ -236,37 +236,6 @@
         }
         [pasteboard setData:markerData forType:type];
     }
-}
-
-- (NSString *)HTMLDocumentForSVGString:(NSString *)svgString {
-    NSString *sanitizedSVG = [self sanitizedSVGString:svgString ?: @""];
-    return [NSString stringWithFormat:
-            @"<!DOCTYPE html>"
-            "<html>"
-            "<head>"
-            "<meta charset=\"utf-8\">"
-            "<style>"
-            "html, body { margin: 0; padding: 0; width: 100%%; height: 100%%; background: transparent; }"
-            "body { display: flex; align-items: center; justify-content: center; overflow: hidden; }"
-            "svg { display: block; max-width: 100%%; max-height: 100%%; width: auto; height: auto; background: transparent; }"
-            "</style>"
-            "</head>"
-            "<body>%@</body>"
-            "</html>",
-            sanitizedSVG];
-}
-
-- (NSString *)sanitizedSVGString:(NSString *)svgString {
-    NSString *sanitized = [svgString copy];
-    sanitized = [sanitized stringByReplacingOccurrencesOfString:@"(?is)^\\s*<\\?xml[^>]*>\\s*"
-                                                     withString:@""
-                                                        options:NSRegularExpressionSearch
-                                                          range:NSMakeRange(0, sanitized.length)];
-    sanitized = [sanitized stringByReplacingOccurrencesOfString:@"(?is)^\\s*<!DOCTYPE[^>]*(\\[[\\s\\S]*?\\])?>\\s*"
-                                                     withString:@""
-                                                        options:NSRegularExpressionSearch
-                                                          range:NSMakeRange(0, sanitized.length)];
-    return sanitized;
 }
 
 - (void)updateStatus:(NSString *)statusText {

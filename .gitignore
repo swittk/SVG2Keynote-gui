@@ -1,0 +1,12 @@
+.DS_Store
+
+# Xcode user-local state
+*.xcuserstate
+xcuserdata/
+
+# Derived/build outputs
+DerivedData/
+build/
+
+# Local debug artifacts
+/tmp/

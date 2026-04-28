@@ -236,6 +236,12 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
     button.bezelStyle = NSBezelStyleRounded;
 }
 
+- (CGFloat)preferredWidthForButton:(NSButton *)button minimumWidth:(CGFloat)minimumWidth {
+    NSSize fittingSize = button.fittingSize;
+    CGFloat width = ceil(fittingSize.width) + 6.0;
+    return MAX(width, minimumWidth);
+}
+
 - (void)buildInterface {
     const CGFloat width = NSWidth(self.view.bounds);
     const CGFloat height = NSHeight(self.view.bounds);
@@ -294,44 +300,54 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
     self.openButton = [NSButton buttonWithTitle:@"Open SVG" target:self action:@selector(openSVG:)];
     [self configureSmallButton:self.openButton];
     self.openButton.toolTip = @"Open SVG File";
-    self.openButton.frame = NSMakeRect(padding, row1Y, 82.0, buttonHeight);
     self.openButton.autoresizingMask = NSViewMaxXMargin | NSViewMinYMargin;
 
     self.pasteSVGButton = [NSButton buttonWithTitle:@"Paste SVG" target:self action:@selector(pasteSVGFromClipboard:)];
     [self configureSmallButton:self.pasteSVGButton];
     self.pasteSVGButton.toolTip = @"Load SVG markup from the clipboard";
-    self.pasteSVGButton.frame = NSMakeRect(NSMaxX(self.openButton.frame) + 8.0, row1Y, 82.0, buttonHeight);
     self.pasteSVGButton.autoresizingMask = NSViewMaxXMargin | NSViewMinYMargin;
 
     self.syncButton = [NSButton buttonWithTitle:@"Resync" target:self action:@selector(resyncCompatibility:)];
     [self configureSmallButton:self.syncButton];
     self.syncButton.toolTip = @"Resync compatibility from a real Keynote clipboard item";
-    self.syncButton.frame = NSMakeRect(padding, row2Y, 72.0, buttonHeight);
     self.syncButton.autoresizingMask = NSViewMaxXMargin | NSViewMinYMargin;
 
     self.saveClipboardButton = [NSButton buttonWithTitle:@"Save..." target:self action:@selector(saveClipboard:)];
     [self configureSmallButton:self.saveClipboardButton];
     self.saveClipboardButton.toolTip = @"Save vector or image data from the clipboard";
-    self.saveClipboardButton.frame = NSMakeRect(NSMaxX(self.syncButton.frame) + 8.0, row2Y, 64.0, buttonHeight);
     self.saveClipboardButton.autoresizingMask = NSViewMaxXMargin | NSViewMinYMargin;
 
     self.aboutButton = [NSButton buttonWithTitle:@"About" target:self action:@selector(showAboutPanel:)];
     [self configureSmallButton:self.aboutButton];
     self.aboutButton.toolTip = @"Show application information";
-    self.aboutButton.frame = NSMakeRect(NSMaxX(self.saveClipboardButton.frame) + 8.0, row2Y, 58.0, buttonHeight);
     self.aboutButton.autoresizingMask = NSViewMaxXMargin | NSViewMinYMargin;
 
     self.quitButton = [NSButton buttonWithTitle:@"Quit" target:self action:@selector(quitApp:)];
     [self configureSmallButton:self.quitButton];
-    self.quitButton.frame = NSMakeRect(NSMaxX(self.aboutButton.frame) + 8.0, row2Y, 50.0, buttonHeight);
     self.quitButton.autoresizingMask = NSViewMaxXMargin | NSViewMinYMargin;
 
     self.clipboardButton = [NSButton buttonWithTitle:@"Copy Shapes" target:self action:@selector(copyToClipboard:)];
     self.clipboardButton.enabled = NO;
     [self configureSmallButton:self.clipboardButton];
     self.clipboardButton.toolTip = @"Copy editable Keynote shapes to the clipboard";
-    self.clipboardButton.frame = NSMakeRect(width - padding - 106.0, row1Y, 106.0, buttonHeight);
     self.clipboardButton.autoresizingMask = NSViewMinXMargin | NSViewMinYMargin;
+
+    const CGFloat buttonGap = 8.0;
+    CGFloat openWidth = [self preferredWidthForButton:self.openButton minimumWidth:82.0];
+    CGFloat pasteWidth = [self preferredWidthForButton:self.pasteSVGButton minimumWidth:82.0];
+    CGFloat syncWidth = [self preferredWidthForButton:self.syncButton minimumWidth:72.0];
+    CGFloat saveWidth = [self preferredWidthForButton:self.saveClipboardButton minimumWidth:64.0];
+    CGFloat aboutWidth = [self preferredWidthForButton:self.aboutButton minimumWidth:58.0];
+    CGFloat quitWidth = [self preferredWidthForButton:self.quitButton minimumWidth:50.0];
+    CGFloat clipboardWidth = [self preferredWidthForButton:self.clipboardButton minimumWidth:106.0];
+
+    self.openButton.frame = NSMakeRect(padding, row1Y, openWidth, buttonHeight);
+    self.pasteSVGButton.frame = NSMakeRect(NSMaxX(self.openButton.frame) + buttonGap, row1Y, pasteWidth, buttonHeight);
+    self.syncButton.frame = NSMakeRect(padding, row2Y, syncWidth, buttonHeight);
+    self.saveClipboardButton.frame = NSMakeRect(NSMaxX(self.syncButton.frame) + buttonGap, row2Y, saveWidth, buttonHeight);
+    self.aboutButton.frame = NSMakeRect(NSMaxX(self.saveClipboardButton.frame) + buttonGap, row2Y, aboutWidth, buttonHeight);
+    self.quitButton.frame = NSMakeRect(NSMaxX(self.aboutButton.frame) + buttonGap, row2Y, quitWidth, buttonHeight);
+    self.clipboardButton.frame = NSMakeRect(width - padding - clipboardWidth, row1Y, clipboardWidth, buttonHeight);
 
     [self.previewContainer addSubview:self.previewView];
     [self.previewContainer addSubview:self.previewPlaceholderLabel];

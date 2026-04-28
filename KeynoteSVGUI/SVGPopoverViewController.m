@@ -119,6 +119,7 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
 @property (nonatomic, strong) NSButton *pasteSVGButton;
 @property (nonatomic, strong) NSButton *syncButton;
 @property (nonatomic, strong) NSButton *saveClipboardButton;
+@property (nonatomic, strong) NSButton *aboutButton;
 @property (nonatomic, strong) NSButton *clipboardButton;
 @property (nonatomic, strong) NSButton *quitButton;
 @property (nonatomic, copy) NSString *currentSVGString;
@@ -314,9 +315,15 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
     self.saveClipboardButton.frame = NSMakeRect(NSMaxX(self.syncButton.frame) + 8.0, row2Y, 64.0, buttonHeight);
     self.saveClipboardButton.autoresizingMask = NSViewMaxXMargin | NSViewMinYMargin;
 
+    self.aboutButton = [NSButton buttonWithTitle:@"About" target:self action:@selector(showAboutPanel:)];
+    [self configureSmallButton:self.aboutButton];
+    self.aboutButton.toolTip = @"Show application information";
+    self.aboutButton.frame = NSMakeRect(NSMaxX(self.saveClipboardButton.frame) + 8.0, row2Y, 58.0, buttonHeight);
+    self.aboutButton.autoresizingMask = NSViewMaxXMargin | NSViewMinYMargin;
+
     self.quitButton = [NSButton buttonWithTitle:@"Quit" target:self action:@selector(quitApp:)];
     [self configureSmallButton:self.quitButton];
-    self.quitButton.frame = NSMakeRect(NSMaxX(self.saveClipboardButton.frame) + 8.0, row2Y, 50.0, buttonHeight);
+    self.quitButton.frame = NSMakeRect(NSMaxX(self.aboutButton.frame) + 8.0, row2Y, 50.0, buttonHeight);
     self.quitButton.autoresizingMask = NSViewMaxXMargin | NSViewMinYMargin;
 
     self.clipboardButton = [NSButton buttonWithTitle:@"Copy Shapes" target:self action:@selector(copyToClipboard:)];
@@ -334,6 +341,7 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
     [self.view addSubview:self.pasteSVGButton];
     [self.view addSubview:self.syncButton];
     [self.view addSubview:self.saveClipboardButton];
+    [self.view addSubview:self.aboutButton];
     [self.view addSubview:self.quitButton];
     [self.view addSubview:self.clipboardButton];
 }
@@ -602,6 +610,59 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
 
 - (void)quitApp:(id)sender {
     [NSApp terminate:sender];
+}
+
+- (void)showAboutPanel:(id)sender {
+    [self activateForForegroundInteraction];
+
+    AppDelegate *appDelegate = (AppDelegate *)NSApp.delegate;
+    [appDelegate closePopover];
+
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    paragraphStyle.alignment = NSTextAlignmentCenter;
+
+    NSDictionary<NSAttributedStringKey, id> *attributes = @{
+        NSFontAttributeName: [NSFont systemFontOfSize:12.0],
+        NSForegroundColorAttributeName: NSColor.textColor,
+        NSParagraphStyleAttributeName: paragraphStyle,
+    };
+
+    NSAttributedString *credits = [[NSAttributedString alloc] initWithString:
+                                   @"Original maintainers\n"
+                                   @"Jonathan Lamperth\n"
+                                   @"Christian Holz\n"
+                                   @"Sensing, Interaction & Perception Lab, ETH Zürich\n\n"
+                                   @"Revised 2026\n"
+                                   @"Switt Kongdachalert"
+                                                                  attributes:attributes];
+
+    NSBundle *bundle = NSBundle.mainBundle;
+    NSString *shortVersion = [bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"] ?: @"1.0";
+    NSString *buildVersion = [bundle objectForInfoDictionaryKey:@"CFBundleVersion"] ?: @"1";
+    NSString *iconPath = [bundle pathForResource:@"AppIcon" ofType:@"icns"];
+    NSImage *aboutIconImage = iconPath.length > 0 ? [[NSImage alloc] initWithContentsOfFile:iconPath] : nil;
+    if (aboutIconImage == nil) {
+        aboutIconImage = NSApp.applicationIconImage;
+    }
+    if (aboutIconImage == nil) {
+        aboutIconImage = [NSWorkspace.sharedWorkspace iconForFile:bundle.bundlePath];
+    }
+    if (aboutIconImage != nil) {
+        aboutIconImage = [aboutIconImage copy];
+        aboutIconImage.size = NSMakeSize(96.0, 96.0);
+    }
+
+    NSDictionary<NSString *, id> *options = @{
+        @"ApplicationName": @"SVG2Keynote",
+        @"ApplicationVersion": shortVersion,
+        @"Version": [NSString stringWithFormat:@"Build %@", buildVersion],
+        @"ApplicationIcon": aboutIconImage ?: NSImage.new,
+        @"Credits": credits,
+        @"Copyright": @"Original project © 2021 Jonathan Lampérth and Christian Holz.\nRevised 2026 Switt Kongdachalert.",
+    };
+
+    [NSApp orderFrontStandardAboutPanelWithOptions:options];
+    [self activateForForegroundInteraction];
 }
 
 - (NSData *)PNGDataForImage:(NSImage *)image {

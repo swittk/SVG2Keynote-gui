@@ -57,11 +57,12 @@ Once clicking on the icon you will be greeted with the following popover:
 
 Here the UI should be pretty straightforward.
 
-1. Use the button "Open SVG File" to select the file which you would like to insert into Keynote.
-2. If needed, copy a primitive Keynote shape and press "Resync Compatibility" to learn the clipboard profile of that local Keynote installation.
-3. Press "Copy Keynote Shapes" to place editable native Keynote data on the clipboard.
-4. Paste into Keynote with `CMD + V`.
-5. Use "Save Clipboard..." to export Keynote vector clipboard data back to SVG, or clipboard images back to PNG.
+1. Use `Open SVG` to pick an SVG file from disk, or `Paste SVG` to load raw SVG markup from the clipboard.
+2. You can also drag an `.svg` file directly onto the menu bar item or onto the open popover.
+3. If needed, copy a primitive Keynote shape and press `Resync` to learn the clipboard profile of that local Keynote installation.
+4. Press `Copy Shapes` to place editable native Keynote data on the clipboard.
+5. Paste into Keynote with `CMD + V`.
+6. Use `Save...` to export Keynote vector clipboard data back to SVG, or clipboard images back to PNG.
 
 
 # What works and what doesn't?
@@ -70,6 +71,8 @@ Here the UI should be pretty straightforward.
 
 - Building directly from source on modern Xcode without Homebrew libraries.
 - Previewing local SVG files with native system frameworks.
+- Loading SVG from the clipboard.
+- Dragging SVG files onto the menu bar item or the open popover.
 - Copying editable native Keynote shapes to the clipboard.
 - Learning and reusing compatibility profiles from real Keynote clipboard samples on the same machine/version.
 - Exporting Keynote vector clipboard content back to SVG.
@@ -97,7 +100,5 @@ The compatibility layer does not re-learn the entire native Keynote object graph
 
 ## Possible future developments
 
-- [ ]  Drag-and-drop functionality
-- [ ]  Get SVG from clipboard functionality
 - [ ]  General code optimizations
 - [ ]  Use a more advanced SVG parsing library.

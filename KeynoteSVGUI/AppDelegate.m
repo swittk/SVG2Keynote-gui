@@ -15,11 +15,11 @@
 
 @interface SVGStatusItemView : NSView <NSDraggingDestination>
 @property (nonatomic, weak) AppDelegate *owner;
-@property (nonatomic, copy) NSString *title;
+@property (nonatomic, strong) NSImage *image;
 @property (nonatomic, assign, getter=isPopoverHighlighted) BOOL popoverHighlighted;
 @property (nonatomic, assign, getter=isDragHighlighted) BOOL dragHighlighted;
 @property (nonatomic, assign) BOOL dragOperationPerformed;
-- (instancetype)initWithOwner:(AppDelegate *)owner title:(NSString *)title frame:(NSRect)frame;
+- (instancetype)initWithOwner:(AppDelegate *)owner image:(NSImage *)image frame:(NSRect)frame;
 @end
 
 @interface AppDelegate ()
@@ -34,19 +34,33 @@ static void ActivateCurrentApp(void) {
     [NSApp activateIgnoringOtherApps:YES];
 }
 
-static CGFloat StatusItemWidthForTitle(NSString *title) {
-    NSDictionary<NSAttributedStringKey, id> *attributes = @{ NSFontAttributeName: [NSFont menuBarFontOfSize:0.0] };
-    return ceil([title sizeWithAttributes:attributes].width) + 18.0;
+static NSImage *BundleApplicationIconImage(void) {
+    NSString *iconPath = [NSBundle.mainBundle pathForResource:@"AppIcon" ofType:@"icns"];
+    if (iconPath.length > 0) {
+        NSImage *iconImage = [[NSImage alloc] initWithContentsOfFile:iconPath];
+        if (iconImage != nil) {
+            return iconImage;
+        }
+    }
+
+    NSWorkspace *workspace = NSWorkspace.sharedWorkspace;
+    NSImage *workspaceIcon = [workspace iconForFile:NSBundle.mainBundle.bundlePath];
+    if (workspaceIcon != nil) {
+        return workspaceIcon;
+    }
+
+    return nil;
 }
 
 @implementation SVGStatusItemView
 
-- (instancetype)initWithOwner:(AppDelegate *)owner title:(NSString *)title frame:(NSRect)frame {
+- (instancetype)initWithOwner:(AppDelegate *)owner image:(NSImage *)image frame:(NSRect)frame {
     self = [super initWithFrame:frame];
     if (self != nil) {
         _owner = owner;
-        _title = [title copy];
+        _image = image;
         [self registerForDraggedTypes:[SVGPopoverViewController supportedSVGPasteboardTypes]];
+        self.toolTip = @"SVG2Key";
     }
     return self;
 }
@@ -60,18 +74,34 @@ static CGFloat StatusItemWidthForTitle(NSString *title) {
     BOOL highlighted = self.isPopoverHighlighted || self.isDragHighlighted;
     [self.owner.statusItem drawStatusBarBackgroundInRect:self.bounds withHighlight:highlighted];
 
-    NSDictionary<NSAttributedStringKey, id> *attributes = @{
-        NSFontAttributeName: [NSFont menuBarFontOfSize:0.0],
-        NSForegroundColorAttributeName: highlighted ? NSColor.alternateSelectedControlTextColor : NSColor.labelColor,
-    };
-
-    NSSize titleSize = [self.title sizeWithAttributes:attributes];
-    NSRect titleRect = NSMakeRect(floor((NSWidth(self.bounds) - titleSize.width) / 2.0),
-                                  floor((NSHeight(self.bounds) - titleSize.height) / 2.0) + 1.0,
-                                  titleSize.width,
-                                  titleSize.height);
-    [self.title drawInRect:titleRect withAttributes:attributes];
+    NSImage *statusImage = self.image;
+    if (statusImage != nil) {
+        NSColor *tintColor = highlighted ? NSColor.alternateSelectedControlTextColor : NSColor.labelColor;
+        NSImage *tintedImage = [self tintedStatusImage:statusImage color:tintColor];
+        CGFloat horizontalInset = 0.5;
+        CGFloat verticalInset = 0.5;
+        CGFloat dimension = floor(MIN(NSWidth(self.bounds) - (horizontalInset * 2.0),
+                                      NSHeight(self.bounds) - (verticalInset * 2.0)));
+        NSRect imageRect = NSMakeRect(floor((NSWidth(self.bounds) - dimension) / 2.0),
+                                      floor((NSHeight(self.bounds) - dimension) / 2.0) + 0.5,
+                                      dimension,
+                                      dimension);
+        [tintedImage drawInRect:imageRect];
+    }
     [super drawRect:dirtyRect];
+}
+
+- (NSImage *)tintedStatusImage:(NSImage *)image color:(NSColor *)color {
+    NSImage *tintedImage = [[NSImage alloc] initWithSize:image.size];
+    [tintedImage lockFocus];
+    [color set];
+    NSRectFill(NSMakeRect(0.0, 0.0, image.size.width, image.size.height));
+    [image drawInRect:NSMakeRect(0.0, 0.0, image.size.width, image.size.height)
+             fromRect:NSZeroRect
+            operation:NSCompositingOperationDestinationIn
+             fraction:1.0];
+    [tintedImage unlockFocus];
+    return tintedImage;
 }
 
 - (void)setPopoverHighlighted:(BOOL)popoverHighlighted {
@@ -167,13 +197,18 @@ static CGFloat StatusItemWidthForTitle(NSString *title) {
     self.popover.contentViewController = [[SVGPopoverViewController alloc] init];
     self.popover.delegate = self;
 
-    NSString *statusTitle = @"SVG2Key";
-    CGFloat statusWidth = StatusItemWidthForTitle(statusTitle);
+    NSImage *applicationIconImage = BundleApplicationIconImage();
+    if (applicationIconImage != nil) {
+        NSApp.applicationIconImage = applicationIconImage;
+    }
+
     CGFloat statusHeight = NSStatusBar.systemStatusBar.thickness;
+    CGFloat statusWidth = statusHeight + 1.0;
+    NSImage *statusImage = [NSImage imageNamed:@"Icon"];
 
     self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:statusWidth];
     self.statusItemView = [[SVGStatusItemView alloc] initWithOwner:self
-                                                             title:statusTitle
+                                                             image:statusImage
                                                              frame:NSMakeRect(0.0, 0.0, statusWidth, statusHeight)];
     self.statusItem.view = self.statusItemView;
     [self configureStatusItemWindowForDragDestination:self.statusItemView.window];

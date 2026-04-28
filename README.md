@@ -4,6 +4,8 @@
 [Sensing, Interaction & Perception Lab](https://siplab.org) <br/>
 Department of Computer Science, ETH Zürich
 
+Refreshed & application rewrite in Obj-C 2026; Switt Kongdachalert
+
 This is the repository for SVG2Keynote GUI, a macOS menu bar utility for previewing Scalable Vector Graphics and pasting them into Apple Keynote as editable native Keynote shapes.
 This fork is a self-contained AppKit/WebKit + Objective-C/C++ app. It builds the Keynote clipboard codec directly from source in-tree, without the old prebuilt Intel-only static archives.
 

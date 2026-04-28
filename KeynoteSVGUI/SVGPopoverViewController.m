@@ -6,6 +6,8 @@
 #import "wrapper.h"
 
 static NSString *const kCompatibilityProfileDefaultsKey = @"CompatibilityProfile";
+static NSPasteboardType const kSVGImagePboardType = @"public.svg-image";
+static NSPasteboardType const kSVGDocumentPboardType = @"public.svg";
 
 typedef struct {
     NSInteger topLevelDrawableCount;
@@ -100,13 +102,16 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
 
 @interface SVGPopoverViewController ()
 @property (nonatomic, strong) WKWebView *previewView;
+@property (nonatomic, strong) NSTextField *previewPlaceholderLabel;
 @property (nonatomic, strong) NSTextField *statusLabel;
 @property (nonatomic, strong) NSButton *openButton;
+@property (nonatomic, strong) NSButton *pasteSVGButton;
 @property (nonatomic, strong) NSButton *syncButton;
 @property (nonatomic, strong) NSButton *saveClipboardButton;
 @property (nonatomic, strong) NSButton *clipboardButton;
 @property (nonatomic, strong) NSButton *quitButton;
 @property (nonatomic, copy) NSString *currentSVGString;
+@property (nonatomic, copy) NSString *currentDocumentName;
 @property (nonatomic, strong) NSURL *currentFileURL;
 @property (nonatomic, assign) BOOL previewReady;
 @end
@@ -114,7 +119,7 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
 @implementation SVGPopoverViewController
 
 - (void)loadView {
-    self.view = [[NSView alloc] initWithFrame:NSMakeRect(0.0, 0.0, 660.0, 440.0)];
+    self.view = [[NSView alloc] initWithFrame:NSMakeRect(0.0, 0.0, 400.0, 300.0)];
 }
 
 - (void)viewDidLoad {
@@ -123,9 +128,27 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
     [self loadPlaceholder];
 }
 
+- (void)configureSmallButton:(NSButton *)button {
+    button.controlSize = NSControlSizeSmall;
+    button.bezelStyle = NSBezelStyleRounded;
+}
+
 - (void)buildInterface {
-    NSView *previewContainer = [[NSView alloc] initWithFrame:NSZeroRect];
-    previewContainer.translatesAutoresizingMaskIntoConstraints = NO;
+    const CGFloat width = NSWidth(self.view.bounds);
+    const CGFloat height = NSHeight(self.view.bounds);
+    const CGFloat padding = 10.0;
+    const CGFloat buttonHeight = 24.0;
+    const CGFloat rowSpacing = 6.0;
+    const CGFloat statusHeight = 28.0;
+    const CGFloat row2Y = 10.0;
+    const CGFloat row1Y = row2Y + buttonHeight + rowSpacing;
+    const CGFloat statusY = row1Y + buttonHeight + 8.0;
+    const CGFloat previewY = statusY + statusHeight + 8.0;
+    const CGFloat previewWidth = width - (padding * 2.0);
+    const CGFloat previewHeight = height - padding - previewY;
+
+    NSView *previewContainer = [[NSView alloc] initWithFrame:NSMakeRect(padding, previewY, previewWidth, previewHeight)];
+    previewContainer.autoresizingMask = NSViewWidthSizable | NSViewMinYMargin;
     previewContainer.wantsLayer = YES;
     previewContainer.layer.backgroundColor = NSColor.clearColor.CGColor;
     previewContainer.layer.borderColor = [NSColor colorWithCalibratedWhite:0.78 alpha:1.0].CGColor;
@@ -134,96 +157,178 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
     previewContainer.layer.masksToBounds = YES;
 
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
-    self.previewView = [[WKWebView alloc] initWithFrame:NSZeroRect configuration:configuration];
+    self.previewView = [[WKWebView alloc] initWithFrame:previewContainer.bounds configuration:configuration];
     self.previewView.navigationDelegate = self;
-    self.previewView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.previewView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     [self.previewView setValue:@NO forKey:@"drawsBackground"];
 
-    self.statusLabel = [[NSTextField alloc] initWithFrame:NSZeroRect];
-    self.statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    self.previewPlaceholderLabel = [[NSTextField alloc] initWithFrame:previewContainer.bounds];
+    self.previewPlaceholderLabel.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+    self.previewPlaceholderLabel.bezeled = NO;
+    self.previewPlaceholderLabel.drawsBackground = NO;
+    self.previewPlaceholderLabel.editable = NO;
+    self.previewPlaceholderLabel.selectable = NO;
+    self.previewPlaceholderLabel.alignment = NSTextAlignmentCenter;
+    self.previewPlaceholderLabel.font = [NSFont systemFontOfSize:12.0];
+    self.previewPlaceholderLabel.textColor = [NSColor colorWithCalibratedWhite:0.42 alpha:1.0];
+    self.previewPlaceholderLabel.stringValue = @"Open or paste SVG.";
+    self.previewPlaceholderLabel.usesSingleLineMode = NO;
+    self.previewPlaceholderLabel.lineBreakMode = NSLineBreakByWordWrapping;
+
+    self.statusLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(padding, statusY, previewWidth, statusHeight)];
+    self.statusLabel.autoresizingMask = NSViewWidthSizable | NSViewMinYMargin;
     self.statusLabel.bezeled = NO;
     self.statusLabel.drawsBackground = NO;
     self.statusLabel.editable = NO;
-    self.statusLabel.font = [NSFont systemFontOfSize:12.0];
+    self.statusLabel.font = [NSFont systemFontOfSize:11.0];
     self.statusLabel.lineBreakMode = NSLineBreakByWordWrapping;
     self.statusLabel.selectable = NO;
     self.statusLabel.stringValue = @"";
     self.statusLabel.usesSingleLineMode = NO;
 
-    self.openButton = [NSButton buttonWithTitle:@"Open SVG File" target:self action:@selector(openSVG:)];
-    self.openButton.translatesAutoresizingMaskIntoConstraints = NO;
+    self.openButton = [NSButton buttonWithTitle:@"Open SVG" target:self action:@selector(openSVG:)];
+    [self configureSmallButton:self.openButton];
+    self.openButton.toolTip = @"Open SVG File";
+    self.openButton.frame = NSMakeRect(padding, row1Y, 82.0, buttonHeight);
+    self.openButton.autoresizingMask = NSViewMaxXMargin | NSViewMinYMargin;
 
-    self.syncButton = [NSButton buttonWithTitle:@"Resync Compatibility" target:self action:@selector(resyncCompatibility:)];
-    self.syncButton.translatesAutoresizingMaskIntoConstraints = NO;
+    self.pasteSVGButton = [NSButton buttonWithTitle:@"Paste SVG" target:self action:@selector(pasteSVGFromClipboard:)];
+    [self configureSmallButton:self.pasteSVGButton];
+    self.pasteSVGButton.toolTip = @"Load SVG markup from the clipboard";
+    self.pasteSVGButton.frame = NSMakeRect(NSMaxX(self.openButton.frame) + 8.0, row1Y, 82.0, buttonHeight);
+    self.pasteSVGButton.autoresizingMask = NSViewMaxXMargin | NSViewMinYMargin;
 
-    self.saveClipboardButton = [NSButton buttonWithTitle:@"Save Clipboard..." target:self action:@selector(saveClipboard:)];
-    self.saveClipboardButton.translatesAutoresizingMaskIntoConstraints = NO;
+    self.syncButton = [NSButton buttonWithTitle:@"Resync" target:self action:@selector(resyncCompatibility:)];
+    [self configureSmallButton:self.syncButton];
+    self.syncButton.toolTip = @"Resync compatibility from a real Keynote clipboard item";
+    self.syncButton.frame = NSMakeRect(padding, row2Y, 72.0, buttonHeight);
+    self.syncButton.autoresizingMask = NSViewMaxXMargin | NSViewMinYMargin;
+
+    self.saveClipboardButton = [NSButton buttonWithTitle:@"Save..." target:self action:@selector(saveClipboard:)];
+    [self configureSmallButton:self.saveClipboardButton];
+    self.saveClipboardButton.toolTip = @"Save vector or image data from the clipboard";
+    self.saveClipboardButton.frame = NSMakeRect(NSMaxX(self.syncButton.frame) + 8.0, row2Y, 64.0, buttonHeight);
+    self.saveClipboardButton.autoresizingMask = NSViewMaxXMargin | NSViewMinYMargin;
 
     self.quitButton = [NSButton buttonWithTitle:@"Quit" target:self action:@selector(quitApp:)];
-    self.quitButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [self configureSmallButton:self.quitButton];
+    self.quitButton.frame = NSMakeRect(NSMaxX(self.saveClipboardButton.frame) + 8.0, row2Y, 50.0, buttonHeight);
+    self.quitButton.autoresizingMask = NSViewMaxXMargin | NSViewMinYMargin;
 
-    self.clipboardButton = [NSButton buttonWithTitle:@"Copy Keynote Shapes" target:self action:@selector(copyToClipboard:)];
-    self.clipboardButton.translatesAutoresizingMaskIntoConstraints = NO;
+    self.clipboardButton = [NSButton buttonWithTitle:@"Copy Shapes" target:self action:@selector(copyToClipboard:)];
     self.clipboardButton.enabled = NO;
+    [self configureSmallButton:self.clipboardButton];
+    self.clipboardButton.toolTip = @"Copy editable Keynote shapes to the clipboard";
+    self.clipboardButton.frame = NSMakeRect(width - padding - 106.0, row1Y, 106.0, buttonHeight);
+    self.clipboardButton.autoresizingMask = NSViewMinXMargin | NSViewMinYMargin;
 
     [previewContainer addSubview:self.previewView];
+    [previewContainer addSubview:self.previewPlaceholderLabel];
     [self.view addSubview:previewContainer];
     [self.view addSubview:self.statusLabel];
     [self.view addSubview:self.openButton];
+    [self.view addSubview:self.pasteSVGButton];
     [self.view addSubview:self.syncButton];
     [self.view addSubview:self.saveClipboardButton];
     [self.view addSubview:self.quitButton];
     [self.view addSubview:self.clipboardButton];
-
-    [NSLayoutConstraint activateConstraints:@[
-        [previewContainer.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:16.0],
-        [previewContainer.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:16.0],
-        [previewContainer.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-16.0],
-        [previewContainer.heightAnchor constraintEqualToConstant:280.0],
-
-        [self.previewView.topAnchor constraintEqualToAnchor:previewContainer.topAnchor],
-        [self.previewView.leadingAnchor constraintEqualToAnchor:previewContainer.leadingAnchor],
-        [self.previewView.trailingAnchor constraintEqualToAnchor:previewContainer.trailingAnchor],
-        [self.previewView.bottomAnchor constraintEqualToAnchor:previewContainer.bottomAnchor],
-
-        [self.statusLabel.topAnchor constraintEqualToAnchor:previewContainer.bottomAnchor constant:12.0],
-        [self.statusLabel.leadingAnchor constraintEqualToAnchor:previewContainer.leadingAnchor],
-        [self.statusLabel.trailingAnchor constraintEqualToAnchor:previewContainer.trailingAnchor],
-
-        [self.openButton.topAnchor constraintEqualToAnchor:self.statusLabel.bottomAnchor constant:12.0],
-        [self.openButton.leadingAnchor constraintEqualToAnchor:previewContainer.leadingAnchor],
-        [self.openButton.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor constant:-16.0],
-
-        [self.syncButton.centerYAnchor constraintEqualToAnchor:self.openButton.centerYAnchor],
-        [self.syncButton.leadingAnchor constraintEqualToAnchor:self.openButton.trailingAnchor constant:12.0],
-
-        [self.saveClipboardButton.centerYAnchor constraintEqualToAnchor:self.openButton.centerYAnchor],
-        [self.saveClipboardButton.leadingAnchor constraintEqualToAnchor:self.syncButton.trailingAnchor constant:12.0],
-
-        [self.quitButton.centerYAnchor constraintEqualToAnchor:self.openButton.centerYAnchor],
-        [self.quitButton.leadingAnchor constraintEqualToAnchor:self.saveClipboardButton.trailingAnchor constant:12.0],
-
-        [self.clipboardButton.centerYAnchor constraintEqualToAnchor:self.openButton.centerYAnchor],
-        [self.clipboardButton.trailingAnchor constraintEqualToAnchor:previewContainer.trailingAnchor],
-        [self.clipboardButton.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.quitButton.trailingAnchor constant:12.0],
-    ]];
 }
 
 - (void)loadPlaceholder {
+    self.currentDocumentName = nil;
     self.previewReady = NO;
     self.clipboardButton.enabled = NO;
-    NSString *status = @"Open an SVG file to preview and copy editable Keynote shapes, or save the current clipboard back out as SVG or PNG.";
+    self.previewPlaceholderLabel.hidden = NO;
+    self.previewPlaceholderLabel.stringValue = @"Open or paste SVG.";
+    NSString *status = @"Open or paste SVG, then copy editable Keynote shapes.";
     NSDictionary<NSString *, id> *compatibilityProfile = [self savedCompatibilityProfile];
     if (compatibilityProfile.count > 0) {
         status = [status stringByAppendingFormat:@" Active compatibility: %@.", [self compatibilitySummaryForProfile:compatibilityProfile]];
     }
     [self updateStatus:status];
-    [self.previewView loadHTMLString:@"<!DOCTYPE html><html><body style=\"margin:0; display:flex; align-items:center; justify-content:center; min-height:100vh; font:13px -apple-system; color:#666; background:transparent;\">Select an SVG file to preview it here.</body></html>" baseURL:nil];
+    [self.previewView loadHTMLString:@"<!DOCTYPE html><html><body style=\"margin:0; background:transparent;\"></body></html>" baseURL:nil];
 }
 
 - (void)activateForForegroundInteraction {
     [[NSRunningApplication currentApplication] activateWithOptions:(NSApplicationActivateAllWindows | NSApplicationActivateIgnoringOtherApps)];
     [NSApp activateIgnoringOtherApps:YES];
+}
+
+- (BOOL)looksLikeSVGString:(NSString *)candidateString {
+    if (![candidateString isKindOfClass:[NSString class]] || candidateString.length == 0) {
+        return NO;
+    }
+
+    NSRange svgRange = [candidateString rangeOfString:@"<svg" options:NSCaseInsensitiveSearch];
+    return svgRange.location != NSNotFound;
+}
+
+- (NSString *)SVGStringFromFileURL:(NSURL *)fileURL error:(NSError **)error {
+    NSStringEncoding usedEncoding = 0;
+    NSString *svgString = [NSString stringWithContentsOfURL:fileURL usedEncoding:&usedEncoding error:error];
+    if (svgString != nil) {
+        return svgString;
+    }
+
+    NSData *data = [NSData dataWithContentsOfURL:fileURL options:0 error:error];
+    if (data == nil) {
+        return nil;
+    }
+
+    return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+}
+
+- (void)loadSVGString:(NSString *)svgString fromFileURL:(NSURL *)fileURL displayName:(NSString *)displayName {
+    self.currentSVGString = svgString;
+    self.currentFileURL = fileURL;
+    self.currentDocumentName = displayName.length > 0 ? displayName : (fileURL.lastPathComponent ?: @"SVG");
+    self.previewReady = NO;
+    self.clipboardButton.enabled = NO;
+    self.previewPlaceholderLabel.hidden = NO;
+    self.previewPlaceholderLabel.stringValue = @"Loading preview…";
+
+    [self updateStatus:[NSString stringWithFormat:@"Loading %@…", self.currentDocumentName]];
+    if (fileURL.isFileURL) {
+        NSURL *readAccessURL = fileURL.URLByDeletingLastPathComponent ?: fileURL;
+        [self.previewView loadFileURL:fileURL allowingReadAccessToURL:readAccessURL];
+        return;
+    }
+
+    NSData *svgData = [svgString dataUsingEncoding:NSUTF8StringEncoding];
+    NSURL *baseURL = [NSURL fileURLWithPath:NSTemporaryDirectory() isDirectory:YES];
+    [self.previewView loadData:svgData MIMEType:@"image/svg+xml" characterEncodingName:@"utf-8" baseURL:baseURL];
+}
+
+- (NSString *)SVGStringFromPasteboard:(NSPasteboard *)pasteboard {
+    for (NSPasteboardType type in @[ kSVGImagePboardType, kSVGDocumentPboardType, NSPasteboardTypeString ]) {
+        NSString *stringValue = [pasteboard stringForType:type];
+        if ([self looksLikeSVGString:stringValue]) {
+            return stringValue;
+        }
+
+        NSData *dataValue = [pasteboard dataForType:type];
+        if (dataValue.length == 0) {
+            continue;
+        }
+
+        NSString *dataString = [[NSString alloc] initWithData:dataValue encoding:NSUTF8StringEncoding];
+        if ([self looksLikeSVGString:dataString]) {
+            return dataString;
+        }
+    }
+
+    return nil;
+}
+
+- (BOOL)importSVGFromPasteboard:(NSPasteboard *)pasteboard {
+    NSString *svgString = [self SVGStringFromPasteboard:pasteboard];
+    if (svgString.length == 0) {
+        [self updateStatus:@"Clipboard does not currently contain SVG markup."];
+        return NO;
+    }
+
+    [self loadSVGString:svgString fromFileURL:nil displayName:@"Clipboard SVG"];
+    return YES;
 }
 
 - (void)openSVG:(id)sender {
@@ -241,28 +346,17 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
 
     NSURL *selectedURL = panel.URL;
     NSError *error = nil;
-    NSStringEncoding usedEncoding = 0;
-    NSString *svgString = [NSString stringWithContentsOfURL:selectedURL usedEncoding:&usedEncoding error:&error];
-    if (svgString == nil) {
-        NSData *data = [NSData dataWithContentsOfURL:selectedURL options:0 error:&error];
-        if (data != nil) {
-            svgString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        }
-    }
-
+    NSString *svgString = [self SVGStringFromFileURL:selectedURL error:&error];
     if (svgString == nil) {
         [self updateStatus:[NSString stringWithFormat:@"Failed to read %@.", selectedURL.lastPathComponent ?: @"the selected file"]];
         return;
     }
 
-    self.currentFileURL = selectedURL;
-    self.currentSVGString = svgString;
-    self.previewReady = NO;
-    self.clipboardButton.enabled = NO;
+    [self loadSVGString:svgString fromFileURL:selectedURL displayName:selectedURL.lastPathComponent];
+}
 
-    [self updateStatus:[NSString stringWithFormat:@"Loading %@…", selectedURL.lastPathComponent ?: @"SVG"]];
-    NSURL *readAccessURL = selectedURL.URLByDeletingLastPathComponent ?: selectedURL;
-    [self.previewView loadFileURL:selectedURL allowingReadAccessToURL:readAccessURL];
+- (void)pasteSVGFromClipboard:(id)sender {
+    [self importSVGFromPasteboard:[NSPasteboard generalPasteboard]];
 }
 
 - (NSInteger)runModalPanelWithPopoverTemporarilyClosed:(NSSavePanel *)panel {
@@ -322,7 +416,7 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
                                       pngData:pngData
                                      tiffData:tiffData];
 
-        NSString *status = @"Copied editable Keynote data to the clipboard. Paste it into Keynote with Command-V.";
+        NSString *status = @"Copied editable Keynote shapes. Paste into Keynote with Command-V.";
         if (compatibilityProfile.count > 0) {
             status = [status stringByAppendingFormat:@" Using %@ compatibility.", [strongSelf compatibilitySummaryForProfile:compatibilityProfile]];
         }
@@ -539,25 +633,86 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
     self.statusLabel.stringValue = statusText ?: @"";
 }
 
+- (void)fitPreviewToContainerWithCompletion:(void (^)(void))completion {
+    NSString *script =
+    @"(() => {"
+    "  try {"
+    "    const root = document.documentElement;"
+    "    if (!root) { return true; }"
+    "    root.style.margin = '0';"
+    "    root.style.width = '100%';"
+    "    root.style.height = '100%';"
+    "    root.style.overflow = 'hidden';"
+    "    root.style.background = 'transparent';"
+    "    if (document.body) {"
+    "      document.body.style.margin = '0';"
+    "      document.body.style.width = '100%';"
+    "      document.body.style.height = '100%';"
+    "      document.body.style.overflow = 'hidden';"
+    "      document.body.style.background = 'transparent';"
+    "    }"
+    "    if (root.tagName && root.tagName.toLowerCase() === 'svg') {"
+    "      root.style.display = 'block';"
+    "      root.style.maxWidth = '100%';"
+    "      root.style.maxHeight = '100%';"
+    "      root.setAttribute('width', '100%');"
+    "      root.setAttribute('height', '100%');"
+    "      root.setAttribute('preserveAspectRatio', 'xMidYMid meet');"
+    "      if (typeof root.getBBox === 'function') {"
+    "        const box = root.getBBox();"
+    "        if (box && isFinite(box.x) && isFinite(box.y) && isFinite(box.width) && isFinite(box.height) && box.width > 0 && box.height > 0) {"
+    "          const padX = Math.max(box.width * 0.05, 1);"
+    "          const padY = Math.max(box.height * 0.05, 1);"
+    "          root.setAttribute('viewBox', `${box.x - padX} ${box.y - padY} ${box.width + padX * 2} ${box.height + padY * 2}`);"
+    "        }"
+    "      }"
+    "    }"
+    "  } catch (error) {"
+    "  }"
+    "  return true;"
+    "})()";
+
+    [self.previewView evaluateJavaScript:script completionHandler:^(__unused id result, __unused NSError *error) {
+        if (completion != nil) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion();
+            });
+        }
+    }];
+}
+
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
-    self.previewReady = YES;
-    self.clipboardButton.enabled = (self.currentSVGString.length > 0);
-    NSString *fileName = self.currentFileURL.lastPathComponent ?: @"SVG";
-    NSString *status = [NSString stringWithFormat:@"%@ loaded. Copy the native Keynote shapes and paste them into Keynote.", fileName];
-    NSDictionary<NSString *, id> *compatibilityProfile = [self savedCompatibilityProfile];
-    if (compatibilityProfile.count > 0) {
-        status = [status stringByAppendingFormat:@" Active compatibility: %@.", [self compatibilitySummaryForProfile:compatibilityProfile]];
-    }
-    [self updateStatus:status];
+    __weak typeof(self) weakSelf = self;
+    [self fitPreviewToContainerWithCompletion:^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+
+        strongSelf.previewPlaceholderLabel.hidden = YES;
+        strongSelf.previewReady = YES;
+        strongSelf.clipboardButton.enabled = (strongSelf.currentSVGString.length > 0);
+        NSString *fileName = strongSelf.currentDocumentName ?: strongSelf.currentFileURL.lastPathComponent ?: @"SVG";
+        NSString *status = [NSString stringWithFormat:@"%@ loaded. Copy shapes and paste into Keynote.", fileName];
+        NSDictionary<NSString *, id> *compatibilityProfile = [strongSelf savedCompatibilityProfile];
+        if (compatibilityProfile.count > 0) {
+            status = [status stringByAppendingFormat:@" Active compatibility: %@.", [strongSelf compatibilitySummaryForProfile:compatibilityProfile]];
+        }
+        [strongSelf updateStatus:status];
+    }];
 }
 
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+    self.previewPlaceholderLabel.hidden = NO;
+    self.previewPlaceholderLabel.stringValue = @"Preview failed.";
     self.previewReady = NO;
     self.clipboardButton.enabled = NO;
     [self updateStatus:error.localizedDescription ?: @"The SVG preview failed to load."];
 }
 
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+    self.previewPlaceholderLabel.hidden = NO;
+    self.previewPlaceholderLabel.stringValue = @"Preview failed.";
     self.previewReady = NO;
     self.clipboardButton.enabled = NO;
     [self updateStatus:error.localizedDescription ?: @"The SVG preview failed to load."];

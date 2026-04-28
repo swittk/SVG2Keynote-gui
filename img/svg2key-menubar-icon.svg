@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none">
+  <g transform="translate(128 143) scale(1.22) translate(-128 -143)">
+    <path d="M56 68H200L210 150H46L56 68Z" stroke="#000000" stroke-width="10" stroke-linejoin="miter"/>
+
+    <path d="M74 92H182" stroke="#000000" stroke-width="4" opacity="0.35" stroke-linecap="square"/>
+    <path d="M66 122H190" stroke="#000000" stroke-width="4" opacity="0.35" stroke-linecap="square"/>
+
+    <circle cx="128" cy="110" r="34" stroke="#000000" stroke-width="9"/>
+    <path d="M128 110V76" stroke="#000000" stroke-width="7" stroke-linecap="square"/>
+    <path d="M128 110L160 90" stroke="#000000" stroke-width="7" stroke-linecap="square"/>
+    <path d="M128 110L162 126" stroke="#000000" stroke-width="7" stroke-linecap="square"/>
+    <path d="M128 110L96 128" stroke="#000000" stroke-width="7" stroke-linecap="square"/>
+
+    <circle cx="128" cy="110" r="7" fill="#000000"/>
+    <circle cx="128" cy="76" r="5.5" fill="#000000"/>
+    <circle cx="160" cy="90" r="5.5" fill="#000000"/>
+    <circle cx="162" cy="126" r="5.5" fill="#000000"/>
+
+    <path d="M128 150V210" stroke="#000000" stroke-width="10" stroke-linecap="square"/>
+    <path d="M96 218H160" stroke="#000000" stroke-width="10" stroke-linecap="square"/>
+  </g>
+</svg>

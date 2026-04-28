@@ -633,7 +633,8 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
                                    @"Christian Holz\n"
                                    @"Sensing, Interaction & Perception Lab, ETH Zürich\n\n"
                                    @"Revised 2026\n"
-                                   @"Switt Kongdachalert"
+                                   @"Switt Kongdachalert\n"
+                                   @"swittssoftware.com"
                                                                   attributes:attributes];
 
     NSBundle *bundle = NSBundle.mainBundle;

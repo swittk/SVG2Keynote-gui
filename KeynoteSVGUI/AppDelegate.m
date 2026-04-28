@@ -80,12 +80,13 @@ static NSImage *BundleApplicationIconImage(void) {
         NSImage *tintedImage = [self tintedStatusImage:statusImage color:tintColor];
         CGFloat horizontalInset = 0.5;
         CGFloat verticalInset = 0.5;
-        CGFloat dimension = floor(MIN(NSWidth(self.bounds) - (horizontalInset * 2.0),
-                                      NSHeight(self.bounds) - (verticalInset * 2.0)));
-        NSRect imageRect = NSMakeRect(floor((NSWidth(self.bounds) - dimension) / 2.0),
-                                      floor((NSHeight(self.bounds) - dimension) / 2.0) + 0.5,
-                                      dimension,
-                                      dimension);
+        CGFloat availableWidth = NSWidth(self.bounds) - (horizontalInset * 2.0);
+        CGFloat availableHeight = NSHeight(self.bounds) - (verticalInset * 2.0);
+        CGFloat imageSide = floor(MIN(availableWidth, availableHeight));
+        NSRect imageRect = NSMakeRect(floor((NSWidth(self.bounds) - imageSide) / 2.0),
+                                      floor((NSHeight(self.bounds) - imageSide) / 2.0) + 0.5,
+                                      imageSide,
+                                      imageSide);
         [tintedImage drawInRect:imageRect];
     }
     [super drawRect:dirtyRect];
@@ -203,7 +204,7 @@ static NSImage *BundleApplicationIconImage(void) {
     }
 
     CGFloat statusHeight = NSStatusBar.systemStatusBar.thickness;
-    CGFloat statusWidth = statusHeight + 1.0;
+    CGFloat statusWidth = 18.0;
     NSImage *statusImage = [NSImage imageNamed:@"Icon"];
 
     self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:statusWidth];

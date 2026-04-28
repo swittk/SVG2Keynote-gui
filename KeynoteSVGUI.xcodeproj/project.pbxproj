@@ -606,7 +606,7 @@
 					"-Wno-unused-function",
 					"-Wno-unused-parameter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = swittk.SVGMenuBar;
+				PRODUCT_BUNDLE_IDENTIFIER = com.swittssoftware.SVGMenuBar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
@@ -649,7 +649,7 @@
 					"-Wno-unused-function",
 					"-Wno-unused-parameter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = swittk.SVGMenuBar;
+				PRODUCT_BUNDLE_IDENTIFIER = com.swittssoftware.SVGMenuBar;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};

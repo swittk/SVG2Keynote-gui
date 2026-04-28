@@ -100,8 +100,19 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
     return summary;
 }
 
+@class SVGPopoverViewController;
+
+@interface SVGPopoverDropView : NSView <NSDraggingDestination>
+@property (nonatomic, weak) SVGPopoverViewController *dropController;
+@end
+
+@interface SVGPreviewWebView : WKWebView <NSDraggingDestination>
+@property (nonatomic, weak) SVGPopoverViewController *dropController;
+@end
+
 @interface SVGPopoverViewController ()
-@property (nonatomic, strong) WKWebView *previewView;
+@property (nonatomic, strong) SVGPreviewWebView *previewView;
+@property (nonatomic, strong) SVGPopoverDropView *previewContainer;
 @property (nonatomic, strong) NSTextField *previewPlaceholderLabel;
 @property (nonatomic, strong) NSTextField *statusLabel;
 @property (nonatomic, strong) NSButton *openButton;
@@ -114,12 +125,103 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
 @property (nonatomic, copy) NSString *currentDocumentName;
 @property (nonatomic, strong) NSURL *currentFileURL;
 @property (nonatomic, assign) BOOL previewReady;
+@property (nonatomic, assign) BOOL dropHighlightVisible;
+@end
+
+@interface SVGPopoverViewController (DragAndDropSupport)
+- (NSDragOperation)dragOperationForPasteboard:(NSPasteboard *)pasteboard;
+- (BOOL)performDropFromPasteboard:(NSPasteboard *)pasteboard;
+- (void)setDropHighlightVisible:(BOOL)dropHighlightVisible;
+@end
+
+@implementation SVGPopoverDropView
+
+- (instancetype)initWithFrame:(NSRect)frameRect {
+    self = [super initWithFrame:frameRect];
+    if (self != nil) {
+        [self registerForDraggedTypes:[SVGPopoverViewController supportedSVGPasteboardTypes]];
+    }
+    return self;
+}
+
+- (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender {
+    return [self.dropController dragOperationForPasteboard:sender.draggingPasteboard];
+}
+
+- (NSDragOperation)draggingUpdated:(id<NSDraggingInfo>)sender {
+    return [self.dropController dragOperationForPasteboard:sender.draggingPasteboard];
+}
+
+- (void)draggingExited:(id<NSDraggingInfo>)sender {
+    [self.dropController setDropHighlightVisible:NO];
+}
+
+- (BOOL)prepareForDragOperation:(id<NSDraggingInfo>)sender {
+    return [self.dropController canImportSVGFromPasteboard:sender.draggingPasteboard];
+}
+
+- (BOOL)performDragOperation:(id<NSDraggingInfo>)sender {
+    return [self.dropController performDropFromPasteboard:sender.draggingPasteboard];
+}
+
+- (void)concludeDragOperation:(id<NSDraggingInfo>)sender {
+    [self.dropController setDropHighlightVisible:NO];
+}
+
+@end
+
+@implementation SVGPreviewWebView
+
+- (instancetype)initWithFrame:(NSRect)frame configuration:(WKWebViewConfiguration *)configuration {
+    self = [super initWithFrame:frame configuration:configuration];
+    if (self != nil) {
+        [self registerForDraggedTypes:[SVGPopoverViewController supportedSVGPasteboardTypes]];
+    }
+    return self;
+}
+
+- (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender {
+    return [self.dropController dragOperationForPasteboard:sender.draggingPasteboard];
+}
+
+- (NSDragOperation)draggingUpdated:(id<NSDraggingInfo>)sender {
+    return [self.dropController dragOperationForPasteboard:sender.draggingPasteboard];
+}
+
+- (void)draggingExited:(id<NSDraggingInfo>)sender {
+    [self.dropController setDropHighlightVisible:NO];
+}
+
+- (BOOL)prepareForDragOperation:(id<NSDraggingInfo>)sender {
+    return [self.dropController canImportSVGFromPasteboard:sender.draggingPasteboard];
+}
+
+- (BOOL)performDragOperation:(id<NSDraggingInfo>)sender {
+    return [self.dropController performDropFromPasteboard:sender.draggingPasteboard];
+}
+
+- (void)concludeDragOperation:(id<NSDraggingInfo>)sender {
+    [self.dropController setDropHighlightVisible:NO];
+}
+
 @end
 
 @implementation SVGPopoverViewController
 
++ (NSArray<NSPasteboardType> *)supportedSVGPasteboardTypes {
+    return @[
+        NSPasteboardTypeFileURL,
+        NSFilenamesPboardType,
+        kSVGImagePboardType,
+        kSVGDocumentPboardType,
+        NSPasteboardTypeString,
+    ];
+}
+
 - (void)loadView {
-    self.view = [[NSView alloc] initWithFrame:NSMakeRect(0.0, 0.0, 400.0, 300.0)];
+    SVGPopoverDropView *rootView = [[SVGPopoverDropView alloc] initWithFrame:NSMakeRect(0.0, 0.0, 400.0, 300.0)];
+    rootView.dropController = self;
+    self.view = rootView;
 }
 
 - (void)viewDidLoad {
@@ -147,22 +249,24 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
     const CGFloat previewWidth = width - (padding * 2.0);
     const CGFloat previewHeight = height - padding - previewY;
 
-    NSView *previewContainer = [[NSView alloc] initWithFrame:NSMakeRect(padding, previewY, previewWidth, previewHeight)];
-    previewContainer.autoresizingMask = NSViewWidthSizable | NSViewMinYMargin;
-    previewContainer.wantsLayer = YES;
-    previewContainer.layer.backgroundColor = NSColor.clearColor.CGColor;
-    previewContainer.layer.borderColor = [NSColor colorWithCalibratedWhite:0.78 alpha:1.0].CGColor;
-    previewContainer.layer.borderWidth = 1.0;
-    previewContainer.layer.cornerRadius = 6.0;
-    previewContainer.layer.masksToBounds = YES;
+    self.previewContainer = [[SVGPopoverDropView alloc] initWithFrame:NSMakeRect(padding, previewY, previewWidth, previewHeight)];
+    self.previewContainer.dropController = self;
+    self.previewContainer.autoresizingMask = NSViewWidthSizable | NSViewMinYMargin;
+    self.previewContainer.wantsLayer = YES;
+    self.previewContainer.layer.backgroundColor = NSColor.clearColor.CGColor;
+    self.previewContainer.layer.borderColor = [NSColor colorWithCalibratedWhite:0.78 alpha:1.0].CGColor;
+    self.previewContainer.layer.borderWidth = 1.0;
+    self.previewContainer.layer.cornerRadius = 6.0;
+    self.previewContainer.layer.masksToBounds = YES;
 
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
-    self.previewView = [[WKWebView alloc] initWithFrame:previewContainer.bounds configuration:configuration];
+    self.previewView = [[SVGPreviewWebView alloc] initWithFrame:self.previewContainer.bounds configuration:configuration];
+    self.previewView.dropController = self;
     self.previewView.navigationDelegate = self;
     self.previewView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     [self.previewView setValue:@NO forKey:@"drawsBackground"];
 
-    self.previewPlaceholderLabel = [[NSTextField alloc] initWithFrame:previewContainer.bounds];
+    self.previewPlaceholderLabel = [[NSTextField alloc] initWithFrame:self.previewContainer.bounds];
     self.previewPlaceholderLabel.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     self.previewPlaceholderLabel.bezeled = NO;
     self.previewPlaceholderLabel.drawsBackground = NO;
@@ -222,9 +326,9 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
     self.clipboardButton.frame = NSMakeRect(width - padding - 106.0, row1Y, 106.0, buttonHeight);
     self.clipboardButton.autoresizingMask = NSViewMinXMargin | NSViewMinYMargin;
 
-    [previewContainer addSubview:self.previewView];
-    [previewContainer addSubview:self.previewPlaceholderLabel];
-    [self.view addSubview:previewContainer];
+    [self.previewContainer addSubview:self.previewView];
+    [self.previewContainer addSubview:self.previewPlaceholderLabel];
+    [self.view addSubview:self.previewContainer];
     [self.view addSubview:self.statusLabel];
     [self.view addSubview:self.openButton];
     [self.view addSubview:self.pasteSVGButton];
@@ -238,6 +342,7 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
     self.currentDocumentName = nil;
     self.previewReady = NO;
     self.clipboardButton.enabled = NO;
+    [self setDropHighlightVisible:NO];
     self.previewPlaceholderLabel.hidden = NO;
     self.previewPlaceholderLabel.stringValue = @"Open or paste SVG.";
     NSString *status = @"Open or paste SVG, then copy editable Keynote shapes.";
@@ -252,6 +357,46 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
 - (void)activateForForegroundInteraction {
     [[NSRunningApplication currentApplication] activateWithOptions:(NSApplicationActivateAllWindows | NSApplicationActivateIgnoringOtherApps)];
     [NSApp activateIgnoringOtherApps:YES];
+}
+
+- (BOOL)URLLooksLikeSVGFile:(NSURL *)fileURL {
+    if (![fileURL isKindOfClass:[NSURL class]] || !fileURL.isFileURL) {
+        return NO;
+    }
+
+    return [fileURL.pathExtension.lowercaseString isEqualToString:@"svg"];
+}
+
+- (NSURL *)SVGFileURLFromPasteboard:(NSPasteboard *)pasteboard {
+    NSDictionary<NSString *, id> *options = @{ NSPasteboardURLReadingFileURLsOnlyKey: @YES };
+    NSArray<NSURL *> *fileURLs = [pasteboard readObjectsForClasses:@[ NSURL.class ] options:options];
+    for (NSURL *fileURL in fileURLs) {
+        if ([self URLLooksLikeSVGFile:fileURL]) {
+            return fileURL;
+        }
+    }
+
+    id filenamesPropertyList = [pasteboard propertyListForType:NSFilenamesPboardType];
+    if ([filenamesPropertyList isKindOfClass:[NSArray class]]) {
+        for (id filename in (NSArray *)filenamesPropertyList) {
+            if (![filename isKindOfClass:[NSString class]]) {
+                continue;
+            }
+
+            NSURL *fileURL = [NSURL fileURLWithPath:(NSString *)filename];
+            if ([self URLLooksLikeSVGFile:fileURL]) {
+                return fileURL;
+            }
+        }
+    }
+
+    NSString *fileURLString = [pasteboard stringForType:NSPasteboardTypeFileURL];
+    NSURL *fileURL = [NSURL URLWithString:fileURLString];
+    if ([self URLLooksLikeSVGFile:fileURL]) {
+        return fileURL;
+    }
+
+    return nil;
 }
 
 - (BOOL)looksLikeSVGString:(NSString *)candidateString {
@@ -284,6 +429,7 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
     self.currentDocumentName = displayName.length > 0 ? displayName : (fileURL.lastPathComponent ?: @"SVG");
     self.previewReady = NO;
     self.clipboardButton.enabled = NO;
+    [self setDropHighlightVisible:NO];
     self.previewPlaceholderLabel.hidden = NO;
     self.previewPlaceholderLabel.stringValue = @"Loading preview…";
 
@@ -320,10 +466,40 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
     return nil;
 }
 
+- (BOOL)canImportSVGFromPasteboard:(NSPasteboard *)pasteboard {
+    if (pasteboard == nil) {
+        return NO;
+    }
+
+    if ([self SVGFileURLFromPasteboard:pasteboard] != nil) {
+        return YES;
+    }
+
+    return ([self SVGStringFromPasteboard:pasteboard].length > 0);
+}
+
 - (BOOL)importSVGFromPasteboard:(NSPasteboard *)pasteboard {
+    [self view];
+
+    NSURL *fileURL = [self SVGFileURLFromPasteboard:pasteboard];
+    if (fileURL != nil) {
+        [self activateForForegroundInteraction];
+
+        NSError *error = nil;
+        NSString *svgString = [self SVGStringFromFileURL:fileURL error:&error];
+        if (svgString.length == 0) {
+            NSString *message = error.localizedDescription ?: [NSString stringWithFormat:@"Failed to read %@.", fileURL.lastPathComponent ?: @"the dropped SVG file"];
+            [self updateStatus:message];
+            return NO;
+        }
+
+        [self loadSVGString:svgString fromFileURL:fileURL displayName:fileURL.lastPathComponent];
+        return YES;
+    }
+
     NSString *svgString = [self SVGStringFromPasteboard:pasteboard];
     if (svgString.length == 0) {
-        [self updateStatus:@"Clipboard does not currently contain SVG markup."];
+        [self updateStatus:@"No SVG data was found in the pasteboard."];
         return NO;
     }
 
@@ -631,6 +807,28 @@ static ClipboardDescriptionSummary ClipboardDescriptionSummaryFromData(NSData *c
 
 - (void)updateStatus:(NSString *)statusText {
     self.statusLabel.stringValue = statusText ?: @"";
+}
+
+- (void)setDropHighlightVisible:(BOOL)dropHighlightVisible {
+    _dropHighlightVisible = dropHighlightVisible;
+    self.previewContainer.layer.borderColor = dropHighlightVisible ? NSColor.keyboardFocusIndicatorColor.CGColor : [NSColor colorWithCalibratedWhite:0.78 alpha:1.0].CGColor;
+    self.previewContainer.layer.borderWidth = dropHighlightVisible ? 2.0 : 1.0;
+
+    if (!self.currentSVGString.length && !self.previewReady) {
+        self.previewPlaceholderLabel.hidden = NO;
+        self.previewPlaceholderLabel.stringValue = dropHighlightVisible ? @"Drop SVG here." : @"Open or paste SVG.";
+    }
+}
+
+- (NSDragOperation)dragOperationForPasteboard:(NSPasteboard *)pasteboard {
+    BOOL canImport = [self canImportSVGFromPasteboard:pasteboard];
+    [self setDropHighlightVisible:canImport];
+    return canImport ? NSDragOperationCopy : NSDragOperationNone;
+}
+
+- (BOOL)performDropFromPasteboard:(NSPasteboard *)pasteboard {
+    [self setDropHighlightVisible:NO];
+    return [self importSVGFromPasteboard:pasteboard];
 }
 
 - (void)fitPreviewToContainerWithCompletion:(void (^)(void))completion {
